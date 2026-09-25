@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .trae/scripts/inject_status.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

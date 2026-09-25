@@ -1,0 +1,16 @@
+# 仓库自身的忽略规则
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+.idea/
+.vscode/
+
+# 分发产物（由 scripts/ 生成，不入库）
+/dist/
+bootstrap.sh
+*.tar.gz
+*.zip
+
+# 注意：template/ 下的 .gitignore 是载荷的一部分，需保留
+!template/.gitignore
