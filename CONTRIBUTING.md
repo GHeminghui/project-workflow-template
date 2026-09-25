@@ -36,6 +36,22 @@
 
 例如：`feat: 为 /advance 增加阶段回退能力`
 
+## 发布
+
+发布由 `.github/workflows/release.yml` 自动完成，只需打 tag 并推送：
+
+```bash
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+工作流会自动执行：发布前校验与测试 → 构建 `dist/` 产物 → 产物自检 → 创建 GitHub Release，
+并附上 `bootstrap.sh`、`project-workflow-template.tar.gz`、`project-workflow-template.zip` 三个产物。
+
+- tag 使用 `v<major>.<minor>.<patch>` 形式，与 `CHANGELOG.md` 的版本号对应
+- 发布前请确认 `CHANGELOG.md` 的 `[Unreleased]` 已归入对应版本段
+- 需要重跑时，可在 Actions 页面手动触发 `Release` 工作流并填入已存在的 tag（步骤幂等，会覆盖同名资产）
+
 ## 决策记录
 
 涉及架构级选择（例如改变状态文件格式、增减阶段）时，请在 `docs/adr/` 新增一条记录，说明背景、备选方案与后果。

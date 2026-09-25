@@ -14,7 +14,9 @@ project-workflow-template/          仓库根 = 开发层
 │   ├── setup-global.sh             全局安装（载荷 + 命令）
 │   └── validate.sh                 校验模板完整性
 ├── tests/test_install.sh           安装端到端测试
-├── .github/workflows/ci.yml        持续集成（校验 + 测试）
+├── .github/workflows/              持续集成与发布
+│   ├── ci.yml                      push/PR 时校验与测试
+│   └── release.yml                 tag 触发打包并创建 Release
 └── template/                       载荷层 = 交付给用户的内容
     ├── AGENTS.md                   用户项目流程规范（会话自动加载）
     ├── PROJECT_STATE.json          用户项目状态（唯一数据源）
@@ -97,6 +99,33 @@ scripts/install.sh <目标目录>
 git init（若目标未初始化）
 ```
 
+### 2.4 发布（release.yml）
+
+```
+推送 tag（v*）或手动触发
+   │
+   ▼
+检出该 tag（fetch-depth: 0，供自动生成 release notes）
+   │
+   ▼
+发布前门控：validate.sh + test_install.sh
+   │  任一失败 ──► 中止，不产出任何产物
+   ▼
+构建分发产物：build-dist.sh
+   │  dist/bootstrap.sh / *.tar.gz / *.zip
+   ▼
+产物自检
+   │  · bootstrap.sh 装入临时目录并跑 inject_status.py
+   │  · 校验压缩包内含 template/PROJECT_STATE.json
+   ▼
+gh release create（--generate-notes --verify-tag）
+   │  若 Release 已存在 ──► gh release upload --clobber
+   ▼
+Release 页面附三个分发产物
+```
+
+**关键点**：门控在打包之前，坏 tag 不会产出产物；Release 步骤幂等，失败重跑不会因「Release 已存在」二次报错。
+
 ## 3. 文件职责速查
 
 | 文件 | 职责 | 改动时需同步 |
@@ -109,7 +138,9 @@ git init（若目标未初始化）
 | `scripts/install.sh` | 载荷分发 | `template/` 文件清单 |
 | `scripts/setup-global.sh` | 全局安装 | `commands/init-project.md` 引用路径 |
 | `scripts/validate.sh` | 完整性校验 | `template/` 结构与状态字段 |
-| `.github/workflows/ci.yml` | 持续集成 | `scripts/validate.sh`、`tests/test_install.sh` |
+| `scripts/build-dist.sh` | 构建分发产物 | `.github/workflows/release.yml` |
+| `.github/workflows/ci.yml` | 持续集成（push/PR 校验与测试） | `scripts/validate.sh`、`tests/test_install.sh` |
+| `.github/workflows/release.yml` | 发布（tag 触发打包与 Release） | `scripts/build-dist.sh`、tag 命名规范 |
 
 ## 4. 路径自适应约定
 

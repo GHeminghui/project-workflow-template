@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 要发布的已存在标签（如 v0.2.0）
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: 打包并发布
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - name: 准备 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 发布前校验
+        run: bash scripts/validate.sh
+
+      - name: 发布前测试
+        run: bash tests/test_install.sh
+
+      - name: 构建分发产物
+        run: bash scripts/build-dist.sh
+
+      - name: 冒烟验证 bootstrap.sh
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"
+          bash dist/bootstrap.sh "$tmp" >/dev/null
+          for f in PROJECT_STATE.json AGENTS.md .trae/commands/advance.md .trae/scripts/inject_status.py; do
+            test -f "$tmp/$f"
+          done
+          TRAE_PROJECT_DIR="$tmp" python3 "$tmp/.trae/scripts/inject_status.py" > "$tmp/status.txt"
+          grep -q "当前阶段" "$tmp/status.txt"
+          echo "bootstrap.sh 冒烟验证通过"
+
+      - name: 校验压缩包内容
+        run: |
+          set -euo pipefail
+          tar -tzf dist/project-workflow-template.tar.gz > "${RUNNER_TEMP:-/tmp}/tar.list"
+          unzip -l dist/project-workflow-template.zip > "${RUNNER_TEMP:-/tmp}/zip.list"
+          grep -q "template/PROJECT_STATE.json" "${RUNNER_TEMP:-/tmp}/tar.list"
+          grep -q "template/PROJECT_STATE.json" "${RUNNER_TEMP:-/tmp}/zip.list"
+          echo "压缩包内容校验通过"
+
+      - name: 创建或更新 Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="${{ github.event.inputs.tag || github.ref_name }}"
+          assets=(
+            dist/bootstrap.sh
+            dist/project-workflow-template.tar.gz
+            dist/project-workflow-template.zip
+          )
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag 已存在，覆盖资产"
+            gh release upload "$tag" "${assets[@]}" --clobber
+          else
+            gh release create "$tag" "${assets[@]}" \
+              --title "$tag" \
+              --generate-notes \
+              --verify-tag
+          fi
+          gh release view "$tag" --json url
