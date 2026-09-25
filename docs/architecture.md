@@ -14,6 +14,7 @@ project-workflow-template/          仓库根 = 开发层
 │   ├── setup-global.sh             全局安装（载荷 + 命令）
 │   └── validate.sh                 校验模板完整性
 ├── tests/test_install.sh           安装端到端测试
+├── .github/workflows/ci.yml        持续集成（校验 + 测试）
 └── template/                       载荷层 = 交付给用户的内容
     ├── AGENTS.md                   用户项目流程规范（会话自动加载）
     ├── PROJECT_STATE.json          用户项目状态（唯一数据源）
@@ -108,6 +109,7 @@ git init（若目标未初始化）
 | `scripts/install.sh` | 载荷分发 | `template/` 文件清单 |
 | `scripts/setup-global.sh` | 全局安装 | `commands/init-project.md` 引用路径 |
 | `scripts/validate.sh` | 完整性校验 | `template/` 结构与状态字段 |
+| `.github/workflows/ci.yml` | 持续集成 | `scripts/validate.sh`、`tests/test_install.sh` |
 
 ## 4. 路径自适应约定
 

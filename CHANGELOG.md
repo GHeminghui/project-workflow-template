@@ -11,6 +11,7 @@
 - 新增 `scripts/validate.sh` 模板完整性校验
 - 新增 `tests/test_install.sh` 安装端到端测试
 - 新增 `CHANGELOG.md`、`CONTRIBUTING.md`
+- 新增 `.github/workflows/ci.yml`：push / PR 时在 ubuntu 与 macOS 上自动运行 `validate.sh` 与 `test_install.sh`
 
 ### Changed
 - `install.sh`、`setup-global.sh` 迁移至 `scripts/` 并适配新结构
