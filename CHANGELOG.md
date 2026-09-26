@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-09-26
+
 ### Added
 - `scripts/validate.sh` 新增第 13 节：校验 `/advance` 的提交步骤必须包含阶段产物（不能只提交状态文件），可识别单行 `&&` 写法
 - `tests/test_install.sh` 新增第 15 节：覆盖升级工具的准入检查（拒绝 / 不写入 / `--apply` 同样拒绝 / `--force` 放行 / 不误伤正常项目）
