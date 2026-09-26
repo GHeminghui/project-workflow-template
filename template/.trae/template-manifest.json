@@ -20,6 +20,10 @@
       "sha256": "6bafe9ec0ee9207b9972002bf2f2fd456292041e232bfa33747be9d32817248a"
     },
     {
+      "path": ".trae/commands/upgrade.md",
+      "sha256": "1041907e3a96aeba1372f86e70bc9b546dff638e01fd9963fd2baab4404a768b"
+    },
+    {
       "path": ".trae/hooks.json",
       "sha256": "5e6a2bb4c16e7ca3223c0c5010e907a7206897e72086a44dbf0759b49ba313ba"
     },
@@ -54,7 +58,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "edc83e68e04d3564e9b2c1cd8ca4e87a10a5eab7a99e3d47094faeefbbe7e3fa"
+      "sha256": "00735e4e5f180e752812c794b0a1983fd7c1a166f8b15c1daf3577bd02c972f2"
     },
     {
       "path": "docs/README.md",

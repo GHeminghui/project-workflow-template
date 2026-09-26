@@ -43,6 +43,7 @@ docs/adr/            模板自身的架构决策记录（不是用户项目的�
 template/            【载荷】被安装到用户项目的内容
 scripts/install.sh   把 template/ 安装到目标项目
 scripts/setup-global.sh 全局安装（模板 + 斜杠命令）
+scripts/upgrade.sh   把项目升级到新版本（默认只读，--apply 落盘）
 scripts/build-dist.sh 构建发布产物（仅打包 git 跟踪文件）
 scripts/gen-manifest.sh 生成/校验模板清单（版本取自 VERSION）
 scripts/validate.sh  校验模板完整性

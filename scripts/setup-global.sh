@@ -58,12 +58,15 @@ for item in AGENTS.md PROJECT_STATE.json README.md .gitignore .trae \
   fi
 done
 
-echo "==> 安装器随载荷放置（供 /init-project 调用）"
-if [[ -f "$REPO_ROOT/scripts/install.sh" ]]; then
-  cp "$REPO_ROOT/scripts/install.sh" "$TEMPLATE_DEST/install.sh"
-else
-  echo "    [警告] 未找到 scripts/install.sh，跳过"
-fi
+echo "==> 安装器随载荷放置（供 /init-project 与 /upgrade 调用）"
+for s in install.sh upgrade.sh; do
+  if [[ -f "$REPO_ROOT/scripts/$s" ]]; then
+    cp "$REPO_ROOT/scripts/$s" "$TEMPLATE_DEST/$s"
+    echo "    复制 $s"
+  else
+    echo "    [警告] 未找到 scripts/$s，跳过"
+  fi
+done
 
 echo "==> 安装全局斜杠命令到: $COMMANDS_DEST"
 for cmd in "$PAYLOAD"/.trae/commands/*.md; do
@@ -80,9 +83,11 @@ cat <<EOF
   /init-project   在当前项目初始化四阶段流程
   /status         查看当前阶段与进度
   /advance        推进到下一阶段
+  /upgrade        把项目的模板文件升级到新版本
 
 注意:
   - /init-project 调用:$TEMPLATE_DEST/install.sh
+  - /upgrade      调用:$TEMPLATE_DEST/upgrade.sh
   - 若命令未生效，请重启 TRAE 或开启新会话
   - 仍需在 设置 → 规则 中开启「将 AGENTS.md 包含在上下文中」
   - 仍需在 设置 → Hooks 中启用 Hook 运行
