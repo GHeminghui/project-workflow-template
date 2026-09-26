@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-26
+
 ### Added
 - `scripts/validate.sh` 新增第 11 节「推荐能力一致性」：校验 `AGENTS.md` 的「推荐技能 / 推荐工具」与四个阶段 README 的「## 推荐能力」完全一致
 - `scripts/validate.sh` 新增第 12 节「阶段 README 结构齐备」：每个阶段 README 必须含非空的「准入条件 / 推荐能力 / 准出产物」三节
