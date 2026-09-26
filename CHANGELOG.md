@@ -7,10 +7,11 @@
 ### Added
 - 新增 `.github/release.yml`：Release notes 分类配置，按 PR 标签归类
 - 新增 `.github/PULL_REQUEST_TEMPLATE.md`：PR 模板
+- 新增 `scripts/setup-labels.sh`：一键创建/同步 8 个 PR 标签（幂等，可重复执行）
 
 ### Changed
 - `CONTRIBUTING.md` 新增「PR 与标签」标签约定，流程补充 PR 步骤，并说明两个 `release.yml` 的区别
-- `docs/architecture.md`、`AGENTS.md` 同步登记新增文件
+- `docs/architecture.md`、`AGENTS.md`、`README.md` 同步登记新增文件与脚本
 
 ## [0.1.2] - 2026-09-26
 

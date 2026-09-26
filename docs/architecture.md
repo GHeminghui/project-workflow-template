@@ -12,7 +12,9 @@ project-workflow-template/          仓库根 = 开发层
 ├── scripts/                        维护与安装脚本
 │   ├── install.sh                  安装载荷到目标项目（路径自适应）
 │   ├── setup-global.sh             全局安装（载荷 + 命令）
-│   └── validate.sh                 校验模板完整性
+│   ├── build-dist.sh               构建发布产物（仅打包 git 跟踪文件）
+│   ├── validate.sh                 校验模板完整性
+│   └── setup-labels.sh             同步 GitHub PR 标签
 ├── tests/test_install.sh           安装端到端测试
 ├── .github/                        仓库级配置
 │   ├── release.yml                 Release notes 分类配置（按 PR 标签）
@@ -141,6 +143,7 @@ Release 页面：按 PR 标签归类的 notes + 三个分发产物
 | `scripts/install.sh` | 载荷分发 | `template/` 文件清单 |
 | `scripts/setup-global.sh` | 全局安装 | `commands/init-project.md` 引用路径 |
 | `scripts/validate.sh` | 完整性校验 | `template/` 结构与状态字段 |
+| `scripts/setup-labels.sh` | 同步 PR 标签（供 release notes 归类） | `.github/release.yml`、`CONTRIBUTING.md` 标签约定 |
 | `scripts/build-dist.sh` | 构建分发产物（以 git 跟踪文件为来源） | `.github/workflows/release.yml` |
 | `.github/workflows/ci.yml` | 持续集成（push/PR 校验与测试） | `scripts/validate.sh`、`tests/test_install.sh` |
 | `.github/workflows/release.yml` | 发布（tag 触发打包与 Release） | `scripts/build-dist.sh`、tag 命名规范 |

@@ -55,6 +55,7 @@
 
 - 每个 PR 至少打上前 6 个标签中的一个；`breaking` 与 `skip-changelog` 按需叠加
 - 分类按 `.github/release.yml` 中的顺序匹配，PR 归入第一个命中的分类，`*` 为兜底
+- 标签尚未创建或误删时，执行 `bash scripts/setup-labels.sh` 一键同步（需安装 `gh` 并完成 `gh auth login`，可重复执行）
 - PR 模板见 `.github/PULL_REQUEST_TEMPLATE.md`
 
 ## 发布

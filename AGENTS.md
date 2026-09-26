@@ -41,7 +41,9 @@ docs/adr/            模板自身的架构决策记录（不是用户项目的�
 template/            【载荷】被安装到用户项目的内容
 scripts/install.sh   把 template/ 安装到目标项目
 scripts/setup-global.sh 全局安装（模板 + 斜杠命令）
+scripts/build-dist.sh 构建发布产物（仅打包 git 跟踪文件）
 scripts/validate.sh  校验模板完整性
+scripts/setup-labels.sh 同步 GitHub PR 标签
 tests/               端到端测试
 .github/release.yml  Release notes 分类配置（按 PR 标签）
 .github/workflows/   持续集成（校验 + 测试）与发布（打 tag 自动打包）
