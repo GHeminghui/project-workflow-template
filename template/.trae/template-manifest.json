@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "template_name": "project-workflow-template",
+  "template_version": "0.2.0",
+  "files": [
+    {
+      "path": ".gitignore",
+      "sha256": "598fef62e7c02d256abf4b9b72415ab982a1862163d5a5e850fdb5369cb2c1a5"
+    },
+    {
+      "path": ".trae/commands/advance.md",
+      "sha256": "af95c67c8c5b5d83dad1abb5b4ded6d894eaaf483d41b774ffdd479b521e33d0"
+    },
+    {
+      "path": ".trae/commands/init-project.md",
+      "sha256": "4278ef2492de5e62e4aef6b4c435ea99734841bcd3a16658208c76cbed47e754"
+    },
+    {
+      "path": ".trae/commands/status.md",
+      "sha256": "6bafe9ec0ee9207b9972002bf2f2fd456292041e232bfa33747be9d32817248a"
+    },
+    {
+      "path": ".trae/hooks.json",
+      "sha256": "5e6a2bb4c16e7ca3223c0c5010e907a7206897e72086a44dbf0759b49ba313ba"
+    },
+    {
+      "path": ".trae/scripts/inject_status.py",
+      "sha256": "61a3b28e0a683a1fc5d5ed64fc076dde243ffcfd2b743500f3bcbc2fe4dfdc0e"
+    },
+    {
+      "path": "00-discovery/README.md",
+      "sha256": "5e58872eccf0bbdc9707d4c61ead9710252a08417794a1829287a84453f1a0a8"
+    },
+    {
+      "path": "01-design/README.md",
+      "sha256": "aebf5c639ff4c3c964ddedc63871c2d14d940f7d0dd4bf9fbed0d7a88555d0be"
+    },
+    {
+      "path": "02-development/README.md",
+      "sha256": "014af06e27d1218255f1925d60a5daa1c299c72f03c5619c03b8cf02f7fd756b"
+    },
+    {
+      "path": "03-operations/README.md",
+      "sha256": "e5042ace4f85dc5375d612c5ae2a7f50038ef4ebe4cbe32b29fd3d6d485f32e3"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "d7e784b2ce7b631f2a1dba02ec8f791e762116794fbde519846b9e4ffe780af2"
+    },
+    {
+      "path": "PROJECT_STATE.json",
+      "sha256": "cf8c31cf041283ad555ab24944b48211097250ab1c5acec7de5333f45f802b00",
+      "mode": "create-only"
+    },
+    {
+      "path": "README.md",
+      "sha256": "edc83e68e04d3564e9b2c1cd8ca4e87a10a5eab7a99e3d47094faeefbbe7e3fa"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "6b30fc262d5eb05e31014491585ccd395243128e1e37c1dce23f5925d398dc45"
+    },
+    {
+      "path": "docs/adr/000-template.md",
+      "sha256": "f36377eb87769059d4355840a68f409a9b06403b838afc43998996757c087625"
+    }
+  ]
+}

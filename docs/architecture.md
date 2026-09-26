@@ -8,6 +8,7 @@
 project-workflow-template/          仓库根 = 开发层
 ├── AGENTS.md                       开发指引（TRAE 打开本仓库时自动加载）
 ├── README.md / CHANGELOG.md / CONTRIBUTING.md / LICENSE
+├── VERSION                         模板版本单一数据源
 ├── docs/                           开发层文档
 │   ├── design.md                   设计原理
 │   ├── architecture.md             架构与数据流（本文件）
@@ -17,6 +18,7 @@ project-workflow-template/          仓库根 = 开发层
 │   ├── install.sh                  安装载荷到目标项目（路径自适应）
 │   ├── setup-global.sh             全局安装（载荷 + 命令）
 │   ├── build-dist.sh               构建发布产物（仅打包 git 跟踪文件）
+│   ├── gen-manifest.sh             生成/校验模板清单
 │   ├── validate.sh                 校验模板完整性
 │   └── setup-labels.sh             同步 GitHub PR 标签
 ├── tests/test_install.sh           安装端到端测试
@@ -33,6 +35,7 @@ project-workflow-template/          仓库根 = 开发层
     ├── .gitignore
     ├── .trae/
     │   ├── hooks.json              SessionStart 事件配置
+    │   ├── template-manifest.json  模板清单（文件边界 + 基线哈希 + 版本）
     │   ├── scripts/inject_status.py 状态渲染脚本
     │   └── commands/               /init-project /status /advance
     ├── 00-discovery/ ~ 03-operations/  四阶段目录 + 说明
@@ -147,6 +150,8 @@ Release 页面：按 PR 标签归类的 notes + 三个分发产物
 | `scripts/install.sh` | 载荷分发 | `template/` 文件清单 |
 | `scripts/setup-global.sh` | 全局安装 | `commands/init-project.md` 引用路径 |
 | `scripts/validate.sh` | 完整性校验 | `template/` 结构与状态字段 |
+| `scripts/gen-manifest.sh` | 生成/校验模板清单 | `VERSION`、`template/.trae/template-manifest.json`、`validate.sh` |
+| `VERSION` | 模板版本单一数据源 | `scripts/gen-manifest.sh`、`CONTRIBUTING.md` 发版流程 |
 | `scripts/setup-labels.sh` | 同步 PR 标签（供 release notes 归类） | `.github/release.yml`、`CONTRIBUTING.md` 标签约定 |
 | `scripts/build-dist.sh` | 构建分发产物（以 git 跟踪文件为来源） | `.github/workflows/release.yml` |
 | `.github/workflows/ci.yml` | 持续集成（push/PR 校验与测试） | `scripts/validate.sh`、`tests/test_install.sh` |

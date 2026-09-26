@@ -35,6 +35,7 @@ AGENTS.md            本文件：开发指引
 README.md            仓库说明（面向人类）
 CHANGELOG.md         优化记录，每次改动都要追加
 CONTRIBUTING.md      贡献流程与约定
+VERSION              模板版本单一数据源（清单与 PROJECT_STATE 的版本由此派生）
 docs/design.md       设计原理：为什么这么设计
 docs/architecture.md 各文件职责与数据流
 docs/specs/          接口与格式规格（如模板清单）
@@ -43,6 +44,7 @@ template/            【载荷】被安装到用户项目的内容
 scripts/install.sh   把 template/ 安装到目标项目
 scripts/setup-global.sh 全局安装（模板 + 斜杠命令）
 scripts/build-dist.sh 构建发布产物（仅打包 git 跟踪文件）
+scripts/gen-manifest.sh 生成/校验模板清单（版本取自 VERSION）
 scripts/validate.sh  校验模板完整性
 scripts/setup-labels.sh 同步 GitHub PR 标签
 tests/               端到端测试

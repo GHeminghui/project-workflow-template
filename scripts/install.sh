@@ -16,6 +16,9 @@
 # 载荷定位（自动）:
 #   仓库内运行      -> ../template
 #   全局模板目录内  -> 脚本同级目录（含 PROJECT_STATE.json）
+#
+# 安装哪些文件、遇到已存在文件如何处理，由载荷内的 .trae/template-manifest.json
+# 声明：mode=manage 可被 --force 覆盖；mode=create-only 永不覆盖。
 
 set -euo pipefail
 
@@ -35,8 +38,14 @@ PROJECT_NAME=""
 NAME_GIVEN=0
 FORCE=0
 
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "错误: 需要 python3 以解析模板清单。" >&2
+  exit 1
+fi
+
 usage() {
-  sed -n '2,20p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+  # 取脚本头部注释块（第 2 行至首个空行），不依赖固定行号
+  sed -n '2,/^$/p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
   exit 0
 }
 
@@ -66,57 +75,65 @@ echo "==> 载荷来源: $PAYLOAD"
 echo "==> 安装目标: $TARGET_DIR"
 echo "==> 项目名称: $PROJECT_NAME"
 
-copy_file() {
-  local rel="$1"
-  local src="$PAYLOAD/$rel"
-  local dst="$TARGET_DIR/$rel"
-  [[ -e "$src" ]] || return 0
+MANIFEST_REL=".trae/template-manifest.json"
+PAYLOAD_MANIFEST="$PAYLOAD/$MANIFEST_REL"
+
+if [[ ! -f "$PAYLOAD_MANIFEST" ]]; then
+  echo "错误: 载荷缺少模板清单 ${MANIFEST_REL}（请在仓库内运行 scripts/gen-manifest.sh 生成）。" >&2
+  exit 1
+fi
+
+echo "==> 按模板清单复制载荷文件"
+STATE_PREEXISTING=0
+while IFS=$'\t' read -r mode rel; do
+  [[ -n "$rel" ]] || continue
+  src="$PAYLOAD/$rel"
+  dst="$TARGET_DIR/$rel"
+  if [[ ! -e "$src" ]]; then
+    echo "    [警告] 清单所列文件在载荷中缺失: $rel"
+    continue
+  fi
+  if [[ "$mode" == "create-only" ]]; then
+    if [[ -e "$dst" ]]; then
+      echo "    [保留] 已存在: ${rel}（用户数据，不覆盖）"
+      if [[ "$rel" == "PROJECT_STATE.json" ]]; then
+        STATE_PREEXISTING=1
+      fi
+      continue
+    fi
+    mkdir -p "$(dirname "$dst")"
+    cp "$src" "$dst"
+    echo "    [写入] ${rel}（仅首次写入）"
+    continue
+  fi
   if [[ -e "$dst" && "$FORCE" -ne 1 ]]; then
     echo "    [跳过] 已存在: $rel"
-    return
+    continue
   fi
   mkdir -p "$(dirname "$dst")"
   cp "$src" "$dst"
   echo "    [写入] $rel"
-}
+done < <(python3 - "$PAYLOAD_MANIFEST" <<'PY'
+import json, sys
+with open(sys.argv[1], encoding="utf-8") as f:
+    manifest = json.load(f)
+for item in manifest.get("files", []):
+    print(f'{item.get("mode", "manage")}\t{item["path"]}')
+PY
+)
 
-echo "==> 创建目录结构"
-for d in 00-discovery 01-design 02-development 03-operations docs/adr .trae/scripts .trae/commands; do
-  mkdir -p "$TARGET_DIR/$d"
-done
-
-echo "==> 复制载荷文件"
-copy_file "AGENTS.md"
-
-# PROJECT_STATE.json 属用户数据（承载项目进度），仅在不存在时写入初始模板；
-# 即使指定 --force 也不整体覆盖，否则会清空 current_stage / checklist / deliverables。
-if [[ -e "$TARGET_DIR/PROJECT_STATE.json" ]]; then
-  STATE_PREEXISTING=1
-  echo "    [保留] 已存在: PROJECT_STATE.json（用户数据，不覆盖）"
+# 清单自身属双重身份文件（载荷声明 + 项目侧基线）：仅在不存在时写入，
+# 即使 --force 也不覆盖，否则基线丢失，升级时将无法判断文件是否被用户改过。
+if [[ -e "$TARGET_DIR/$MANIFEST_REL" ]]; then
+  echo "    [保留] 已存在: ${MANIFEST_REL}（安装基线，不覆盖）"
 else
-  STATE_PREEXISTING=0
-  cp "$PAYLOAD/PROJECT_STATE.json" "$TARGET_DIR/PROJECT_STATE.json"
-  echo "    [写入] PROJECT_STATE.json"
+  mkdir -p "$TARGET_DIR/$(dirname "$MANIFEST_REL")"
+  cp "$PAYLOAD_MANIFEST" "$TARGET_DIR/$MANIFEST_REL"
+  echo "    [写入] $MANIFEST_REL"
 fi
 
-copy_file "README.md"
-copy_file ".gitignore"
-copy_file "docs/README.md"
-copy_file "docs/adr/000-template.md"
-copy_file ".trae/hooks.json"
-copy_file ".trae/scripts/inject_status.py"
-
-for cmd in "$PAYLOAD"/.trae/commands/*.md; do
-  [[ -e "$cmd" ]] && copy_file ".trae/commands/$(basename "$cmd")"
-done
-
-for stage in 00-discovery 01-design 02-development 03-operations; do
-  copy_file "$stage/README.md"
-done
-
 echo "==> 处理 PROJECT_STATE.json"
-if command -v python3 >/dev/null 2>&1; then
-  python3 - "$TARGET_DIR/PROJECT_STATE.json" "$PROJECT_NAME" "$STATE_PREEXISTING" "$NAME_GIVEN" <<'PY'
+python3 - "$TARGET_DIR/PROJECT_STATE.json" "$PROJECT_NAME" "$STATE_PREEXISTING" "$NAME_GIVEN" <<'PY'
 import json, sys, datetime
 
 path, name = sys.argv[1], sys.argv[2]
@@ -130,7 +147,7 @@ today = datetime.date.today().isoformat()
 changed = False
 
 if not preexisting:
-    # 全新安装：写入初始状态的元信息
+    # 全新安装：写入初始状态的元信息（template_version 已由模板清单带出）
     data["project_name"] = name
     data["created_at"] = today
     if data.get("current_stage") in data.get("stages", {}):
@@ -153,9 +170,6 @@ if changed:
         json.dump(data, f, ensure_ascii=False, indent=2)
         f.write("\n")
 PY
-else
-  echo "    [警告] 未找到 python3，跳过状态处理"
-fi
 
 chmod +x "$TARGET_DIR/.trae/scripts/inject_status.py" 2>/dev/null || true
 

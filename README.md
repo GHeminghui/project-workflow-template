@@ -21,6 +21,7 @@
 ├── README.md           本文件
 ├── CHANGELOG.md        优化记录
 ├── CONTRIBUTING.md     贡献约定
+├── VERSION             模板版本（单一数据源）
 ├── docs/
 │   ├── design.md       设计原理
 │   ├── architecture.md 架构与数据流
@@ -35,6 +36,7 @@
 │   ├── install.sh      安装到单个项目
 │   ├── setup-global.sh 全局安装
 │   ├── build-dist.sh   构建发布产物
+│   ├── gen-manifest.sh 生成/校验模板清单
 │   ├── validate.sh     校验模板完整性
 │   └── setup-labels.sh 同步 GitHub PR 标签
 └── tests/
