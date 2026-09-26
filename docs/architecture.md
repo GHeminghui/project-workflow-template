@@ -14,9 +14,12 @@ project-workflow-template/          仓库根 = 开发层
 │   ├── setup-global.sh             全局安装（载荷 + 命令）
 │   └── validate.sh                 校验模板完整性
 ├── tests/test_install.sh           安装端到端测试
-├── .github/workflows/              持续集成与发布
-│   ├── ci.yml                      push/PR 时校验与测试
-│   └── release.yml                 tag 触发打包并创建 Release
+├── .github/                        仓库级配置
+│   ├── release.yml                 Release notes 分类配置（按 PR 标签）
+│   ├── PULL_REQUEST_TEMPLATE.md    PR 模板
+│   └── workflows/                  持续集成与发布
+│       ├── ci.yml                  push/PR 时校验与测试
+│       └── release.yml             tag 触发打包并创建 Release
 └── template/                       载荷层 = 交付给用户的内容
     ├── AGENTS.md                   用户项目流程规范（会话自动加载）
     ├── PROJECT_STATE.json          用户项目状态（唯一数据源）
@@ -121,10 +124,10 @@ git init（若目标未初始化）
 gh release create（--generate-notes --verify-tag）
    │  若 Release 已存在 ──► gh release upload --clobber
    ▼
-Release 页面附三个分发产物
+Release 页面：按 PR 标签归类的 notes + 三个分发产物
 ```
 
-**关键点**：门控在打包之前，坏 tag 不会产出产物；Release 步骤幂等，失败重跑不会因「Release 已存在」二次报错。产物内容以 `git ls-files` 跟踪文件为准，未跟踪文件（如 `.DS_Store`）不会进入 `bootstrap.sh` 或压缩包，本地与 CI 构建结果一致。
+**关键点**：门控在打包之前，坏 tag 不会产出产物；Release 步骤幂等，失败重跑不会因「Release 已存在」二次报错。产物内容以 `git ls-files` 跟踪文件为准，未跟踪文件（如 `.DS_Store`）不会进入 `bootstrap.sh` 或压缩包，本地与 CI 构建结果一致。notes 的分类规则来自 `.github/release.yml`，依据 PR 标签归类。
 
 ## 3. 文件职责速查
 
@@ -141,6 +144,8 @@ Release 页面附三个分发产物
 | `scripts/build-dist.sh` | 构建分发产物（以 git 跟踪文件为来源） | `.github/workflows/release.yml` |
 | `.github/workflows/ci.yml` | 持续集成（push/PR 校验与测试） | `scripts/validate.sh`、`tests/test_install.sh` |
 | `.github/workflows/release.yml` | 发布（tag 触发打包与 Release） | `scripts/build-dist.sh`、tag 命名规范 |
+| `.github/release.yml` | Release notes 分类配置（按 PR 标签归类） | `CONTRIBUTING.md` 的标签约定 |
+| `.github/PULL_REQUEST_TEMPLATE.md` | PR 模板 | `CONTRIBUTING.md` 的流程与标签约定 |
 
 ## 4. 路径自适应约定
 

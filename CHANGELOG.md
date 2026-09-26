@@ -4,6 +4,14 @@
 
 ## [Unreleased]
 
+### Added
+- 新增 `.github/release.yml`：Release notes 分类配置，按 PR 标签归类
+- 新增 `.github/PULL_REQUEST_TEMPLATE.md`：PR 模板
+
+### Changed
+- `CONTRIBUTING.md` 新增「PR 与标签」标签约定，流程补充 PR 步骤，并说明两个 `release.yml` 的区别
+- `docs/architecture.md`、`AGENTS.md` 同步登记新增文件
+
 ## [0.1.2] - 2026-09-26
 
 ### Changed

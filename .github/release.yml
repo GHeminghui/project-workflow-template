@@ -1,0 +1,37 @@
+# GitHub Release notes 分类配置（官方约定文件名）。
+#
+# 由 GitHub 在生成 release notes 时读取，按 PR 标签把条目归入下列分类；
+# 标签约定见 CONTRIBUTING.md「PR 与标签」。
+#
+# 注意：本文件与 .github/workflows/release.yml 是两个不同文件——
+#   .github/release.yml             本文件：Release notes 分类配置
+#   .github/workflows/release.yml   发布工作流：打 tag 时打包并创建 Release
+#
+# 分类按顺序匹配，PR 归入第一个命中的分类；labels: "*" 为兜底分类，须置于末尾。
+
+changelog:
+  exclude:
+    labels:
+      - skip-changelog
+  categories:
+    - title: ⚠️ 破坏性变更
+      labels:
+        - breaking
+    - title: 🚀 新增能力
+      labels:
+        - feat
+    - title: 🐛 修复
+      labels:
+        - fix
+    - title: ♻️ 结构调整
+      labels:
+        - refactor
+    - title: ✅ 测试
+      labels:
+        - test
+    - title: 📝 文档
+      labels:
+        - docs
+    - title: 🔧 其他变更
+      labels:
+        - "*"

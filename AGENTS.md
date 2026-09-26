@@ -43,6 +43,7 @@ scripts/install.sh   把 template/ 安装到目标项目
 scripts/setup-global.sh 全局安装（模板 + 斜杠命令）
 scripts/validate.sh  校验模板完整性
 tests/               端到端测试
+.github/release.yml  Release notes 分类配置（按 PR 标签）
 .github/workflows/   持续集成（校验 + 测试）与发布（打 tag 自动打包）
 ```
 

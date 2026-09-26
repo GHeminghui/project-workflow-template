@@ -20,6 +20,7 @@
    ```
 5. 更新 `CHANGELOG.md` 的 `[Unreleased]` 段
 6. 提交并说明改动原因
+7. 发起 Pull Request 并打上标签（见「PR 与标签」），`ci.yml` 会自动运行校验与测试
 
 ## 提交信息
 
@@ -36,6 +37,26 @@
 
 例如：`feat: 为 /advance 增加阶段回退能力`
 
+## PR 与标签
+
+改动通过 Pull Request 合入 `main`，并打上标签——Release notes 就是按这些标签自动归类的
+（配置见 `.github/release.yml`）。标签名与提交前缀保持一致，不必额外记一套词汇：
+
+| 标签 | 含义 | 归入的分类 |
+|------|------|-----------|
+| `feat` | 新增能力 | 🚀 新增能力 |
+| `fix` | 修复问题 | 🐛 修复 |
+| `refactor` | 结构调整 | ♻️ 结构调整 |
+| `test` | 测试相关 | ✅ 测试 |
+| `docs` | 文档改动 | 📝 文档 |
+| `chore` | 杂项 | 🔧 其他变更 |
+| `breaking` | 存在破坏性变更 | ⚠️ 破坏性变更（优先展示） |
+| `skip-changelog` | 不纳入 release notes | 不出现 |
+
+- 每个 PR 至少打上前 6 个标签中的一个；`breaking` 与 `skip-changelog` 按需叠加
+- 分类按 `.github/release.yml` 中的顺序匹配，PR 归入第一个命中的分类，`*` 为兜底
+- PR 模板见 `.github/PULL_REQUEST_TEMPLATE.md`
+
 ## 发布
 
 发布由 `.github/workflows/release.yml` 自动完成，只需打 tag 并推送：
@@ -51,11 +72,15 @@ git push origin v0.2.0
 - tag 使用 `v<major>.<minor>.<patch>` 形式，与 `CHANGELOG.md` 的版本号对应
 - 发布前请确认 `CHANGELOG.md` 的 `[Unreleased]` 已归入对应版本段
 - 产物资内容以 **git 跟踪文件**为准（`scripts/build-dist.sh` 基于 `git ls-files`）：新增文件需先 `git add` 才会进入产物，未跟踪文件（如 `.DS_Store`）不会被打包
+- Release notes 由 GitHub 自动生成，并按 PR 标签归类（配置 `.github/release.yml`，约定见「PR 与标签」）；直接推送到 `main` 的提交不会出现在分类明细里
 - 需要重跑时，可在 Actions 页面手动触发 `Release` 工作流并填入已存在的 tag（步骤幂等，会覆盖同名资产）
 
 > ⚠️ **tag 所指的提交必须已包含 `.github/workflows/release.yml`**，否则 GitHub 不会触发发布工作流，也就不会创建 Release。
 > GitHub Actions 对 push 事件只读取触发该事件的 ref 中实际存在的工作流文件，因此给工作流引入之前的历史提交补 tag 时，
 > 不会自动发布，需改用 Actions 页面的手动触发（填入该已存在的 tag）。
+
+> 📌 两个 `release.yml` 不要混淆：`.github/release.yml` 是 **Release notes 分类配置**（GitHub 官方约定文件名），
+> `.github/workflows/release.yml` 是**发布工作流本体**。前者被 GitHub 读取用于归类 notes，不参与任何构建。
 
 ## 决策记录
 
