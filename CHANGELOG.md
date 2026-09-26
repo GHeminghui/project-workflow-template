@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-26
+
 ### Added
 - `scripts/validate.sh` 新增第 9 节「阶段准出一致性」：强制校验门控（`PROJECT_STATE.json` 的 checklist）与 `AGENTS.md`、四个阶段 README、两张阶段产物汇总表五处描述一致
 
