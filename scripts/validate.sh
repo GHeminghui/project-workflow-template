@@ -469,6 +469,56 @@ else
   bad "未找到 python3，跳过"
 fi
 
+section "13. /advance 的提交步骤必须包含阶段产物（不能只提交状态文件）"
+if command -v python3 >/dev/null 2>&1; then
+  OUT=$(python3 - "$TEMPLATE" <<'PY'
+import os
+import re
+import sys
+
+path = os.path.join(sys.argv[1], ".trae/commands/advance.md")
+with open(path, encoding="utf-8") as f:
+    text = f.read()
+
+add_lines = re.findall(r"^[ \t]*git add[^\n]*$", text, re.M)
+if not add_lines:
+    print("  ❌ advance.md 中找不到 git add 步骤")
+    print("  /advance 需要把阶段产物与 PROJECT_STATE.json 一并提交")
+    sys.exit(1)
+
+problem = []
+has_state = False
+for line in add_lines:
+    # 只取同一条命令里的 git add 片段（可能是「git add X && git commit ...」一行写完）
+    seg = line.split("&&")[0]
+    toks = [t.strip("\"'") for t in seg.split("git add", 1)[1].split()]
+    toks = [t for t in toks if t and not t.startswith("-")]
+    if "PROJECT_STATE.json" in toks:
+        has_state = True
+        if all(t == "PROJECT_STATE.json" for t in toks):
+            problem.append(line.strip())
+
+if not has_state:
+    print("  ❌ advance.md 的提交步骤未包含 PROJECT_STATE.json")
+    sys.exit(1)
+if problem:
+    for l in problem:
+        print("  ❌ 只提交状态文件，阶段产物会留在版本库外: " + l)
+    print("  提交步骤须同时包含当前阶段目录（如 <当前阶段目录>/）与 PROJECT_STATE.json")
+    sys.exit(1)
+sys.exit(0)
+PY
+)
+  if [[ $? -eq 0 ]]; then
+    ok "/advance 的提交步骤同时包含阶段产物与状态文件"
+  else
+    bad "/advance 的提交步骤会把阶段产物留在版本库外"
+    echo "$OUT" | sed 's/^/     /'
+  fi
+else
+  bad "未找到 python3，跳过"
+fi
+
 echo
 echo "========================================"
 echo "  校验结果: 通过 $PASS 项，失败 $FAIL 项"
