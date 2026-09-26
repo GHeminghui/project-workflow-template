@@ -58,6 +58,38 @@
 - 标签尚未创建或误删时，执行 `bash scripts/setup-labels.sh` 一键同步（需安装 `gh` 并完成 `gh auth login`，可重复执行）
 - PR 模板见 `.github/PULL_REQUEST_TEMPLATE.md`
 
+## 分支保护
+
+`main` 是受保护分支（在仓库 **Settings → Rules → Rulesets → New branch ruleset** 中配置，
+GitHub 现在以 Rulesets 承载此类规则）。约定如下，目的是「对贡献者严格、对维护者保留发布后门」：
+
+| 规则 | 设置 | 理由 |
+|------|------|------|
+| Require a pull request before merging | 开，`Required approvals` 填 **0** | 所有改动走 PR，但不强制他人审批（单人仓库无法自审） |
+| Require status checks to pass | 开，必需检查见下 | 校验与测试必须先通过 |
+| Block force pushes | 开 | 防止改写已发布历史 |
+| Restrict deletions | 开 | 防止误删 `main` |
+| Require linear history | 不开 | 保留 merge/squash 的灵活性 |
+| Bypass list | `Repository admin`，权限 **Always** | 让发布提交仍可直推（见下） |
+
+**必需状态检查**（`Require status checks to pass` 里 `Add checks` 勾选，两个都要）：
+
+```
+校验与测试 (ubuntu-latest)
+校验与测试 (macos-latest)
+```
+
+> 这两个名字来自 `.github/workflows/ci.yml` 中 `check` 任务的 `name: 校验与测试 (${{ matrix.os }})`
+> ——矩阵会展开为两条独立检查。注意候选列表**只列出已跑过至少一次的检查**；若搜不到，先开个 PR
+> 让 CI 跑一次再回来添加。
+
+**唯一例外——发布提交直推 `main`**：发版时的版本对齐提交（见「发布」第 5 步）由仓库管理员经
+bypass 直推 `main`，**不走 PR**。原因是这条提交本身就是为生成 release notes 而生，若走 PR 会
+被归类进它自己的 release notes 里，不干净。除它之外的所有改动一律走 PR。
+
+> 维护者注意：本仓库集成所用的 token 没有 `administration` 权限，无法用命令读写分支保护配置，
+> 上述规则需在 GitHub 网页端设置。
+
 ## 发布
 
 `VERSION` 是模板版本的**单一数据源**，`template/.trae/template-manifest.json` 与
@@ -85,11 +117,13 @@
    bash scripts/validate.sh && bash tests/test_install.sh
    ```
 
-5. 提交后打 tag 并推送：
+5. 提交版本对齐改动并**直推 `main`**（维护者经分支保护 bypass，见「分支保护」），随后打 tag 推送：
 
    ```bash
-   git tag v0.2.0
-   git push origin v0.2.0
+   git commit -am "chore: 发布 v0.3.0（CHANGELOG 版本对齐）"
+   git push origin main
+   git tag v0.3.0
+   git push origin v0.3.0
    ```
 
 工作流会自动执行：发布前校验与测试 → 构建 `dist/` 产物 → 产物自检 → 创建 GitHub Release，
