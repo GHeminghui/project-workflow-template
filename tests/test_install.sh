@@ -319,6 +319,51 @@ bash "$UP_PAYLOAD/upgrade.sh" "$NOT_PROJ" --force >/dev/null 2>&1; UP_RC=$?
 UP_OUT="$(bash "$UP_PAYLOAD/upgrade.sh" "$UP_PROJ" 2>&1)"
 echo "$UP_OUT" | grep -q "不像模板项目" && bad "正常项目被误判为非项目" || ok "正常项目不受影响（门禁无误伤）"
 
+section "16. Go/No-Go 判定字段（discovery.decision）"
+# 判定字段属于调研阶段；前面的用例把 current_stage 改到了别的阶段，这里先归位
+python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
+import json, sys
+p = sys.argv[1]
+d = json.load(open(p, encoding="utf-8"))
+d["current_stage"] = "discovery"
+d["project_status"] = "active"
+d["stages"]["discovery"]["decision"] = "pending"
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+PY
+DEC=$(python3 -c "import json;print(json.load(open('$TARGET/PROJECT_STATE.json',encoding='utf-8'))['stages']['discovery'].get('decision'))")
+[[ "$DEC" == "pending" ]] && ok "新装项目 discovery.decision 初始为 pending" || bad "初始值异常: $DEC"
+OUT_D=$(TRAE_PROJECT_DIR="$TARGET" python3 "$TARGET/.trae/scripts/inject_status.py" 2>&1 || true)
+echo "$OUT_D" | grep -q "Go/No-Go 判定: 未判定" && ok "Hook 展示「未判定」" || bad "Hook 未展示判定: ${OUT_D}"
+python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
+import json, sys
+p = sys.argv[1]
+d = json.load(open(p, encoding="utf-8"))
+d["stages"]["discovery"]["decision"] = "no-go"
+d["project_status"] = "rejected"
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+PY
+OUT_D2=$(TRAE_PROJECT_DIR="$TARGET" python3 "$TARGET/.trae/scripts/inject_status.py" 2>&1 || true)
+echo "$OUT_D2" | grep -q "Go/No-Go 判定: No-Go" && ok "Hook 展示「No-Go」" || bad "Hook 未展示 No-Go: ${OUT_D2}"
+echo "$OUT_D2" | grep -q "已否决" && ok "No-Go 时项目状态渲染为已否决" || bad "No-Go 状态未渲染"
+python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
+import json, sys
+p = sys.argv[1]
+d = json.load(open(p, encoding="utf-8"))
+d["stages"]["discovery"].pop("decision", None)
+d["project_status"] = "active"
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+PY
+OUT_D3=$(TRAE_PROJECT_DIR="$TARGET" python3 "$TARGET/.trae/scripts/inject_status.py" 2>&1 || true)
+echo "$OUT_D3" | grep -q "当前阶段" && ok "缺 decision 字段时 Hook 仍正常（向后兼容）" || bad "缺字段导致 Hook 异常: ${OUT_D3}"
+echo "$OUT_D3" | grep -q "Go/No-Go 判定" && bad "缺字段时仍输出判定行" || ok "缺字段时不输出判定行"
+python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
+import json, sys
+p = sys.argv[1]
+d = json.load(open(p, encoding="utf-8"))
+d["stages"]["discovery"]["decision"] = "pending"
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+PY
+
 echo
 echo "========================================"
 echo "  测试结果: 通过 $PASS 项，失败 $FAIL 项"

@@ -95,10 +95,16 @@ for s in order:
             errs.append(f"阶段 {s} 的 checklist 项缺少 item/done")
 if data.get("current_stage") not in order:
     errs.append("current_stage 不在 stage_order 中")
+# discovery 的 Go/No-Go 结论必须有结构化字段（/advance 依此判定，而非解读 decision.md）
+decision = stages.get("discovery", {}).get("decision")
+if decision not in ("pending", "go", "no-go"):
+    errs.append(f"discovery.decision 缺失或非法: {decision!r}（应为 pending / go / no-go）")
+if data.get("project_status") == "rejected" and decision != "no-go":
+    errs.append("project_status 为 rejected，但 discovery.decision 不是 no-go")
 if errs:
     print("  ❌ " + "；".join(errs))
     sys.exit(1)
-print("  ✅ 状态结构与四阶段定义一致")
+print("  ✅ 状态结构与四阶段定义一致（含 discovery.decision）")
 PY
   [[ $? -eq 0 ]] && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 fi

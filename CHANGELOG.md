@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+### Added
+- **`PROJECT_STATE.json` 新增 `stages.discovery.decision` 字段**（`pending` / `go` / `no-go`）：把 Go/No-Go 结论从「AI 解读 `decision.md` 措辞」改为**确定性字段判定**——此前它是整套「状态单一数据源」之外唯一的软肋（dogfooding 发现项 F4，决策见 `docs/adr/003-discovery-decision-field.md`）
+- `scripts/validate.sh` 第 3 节新增校验：`discovery.decision` 必须存在且取值合法，且 `project_status: rejected` 必然对应 `decision: no-go`
+- `tests/test_install.sh` 新增第 16 节：判定字段初值、Hook 展示、No-Go 渲染、缺字段的向后兼容
+
+### Changed
+- `template/.trae/commands/advance.md` 第 5 步改为依 `decision` 字段分支；`pending` 或字段缺失（老项目）时读 `decision.md` 并请用户确认，**先把结论写入字段**再推进——不再替用户判定
+- `inject_status.py` 在会话开始即展示 Go/No-Go 判定；`/status` 同步展示；`AGENTS.md` 的「状态维护」补充该字段说明
+- `docs/design.md`、`docs/architecture.md` 补充设计理由与数据流说明
+- `VERSION` 推进至 `0.7.0`（本段改动触及载荷）
+
 ## [0.6.1] - 2026-09-26
 
 ### Added

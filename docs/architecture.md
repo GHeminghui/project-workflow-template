@@ -92,6 +92,10 @@ AI 读取 PROJECT_STATE.json
               告知用户新阶段与下一步
 ```
 
+**关键点**：阶段推进完全由 `PROJECT_STATE.json` 的字段驱动。调研阶段额外看 `stages.discovery.decision`——
+`no-go` 置 `project_status=rejected` 并停止推进；`pending`（或老项目缺该字段）时先读 `decision.md` 并请用户确认，
+把结论写入字段后再推进。这样 Go/No-Go 是确定性判定，而非解读文档措辞（见 [ADR-003](adr/003-discovery-decision-field.md)）。
+
 ### 2.3 安装（install.sh）
 
 ```
@@ -178,7 +182,7 @@ Release 页面：按 PR 标签归类的 notes + 三个分发产物
 | `scripts/install.sh` | 载荷分发 | `template/` 文件清单 |
 | `scripts/setup-global.sh` | 全局安装 | `commands/init-project.md`、`commands/upgrade.md` 的引用路径 |
 | `scripts/upgrade.sh` | 升级项目内模板文件 | `docs/specs/upgrade-tool.md`、`VERSION`、模板清单 |
-| `scripts/validate.sh` | 完整性校验（清单一致性、阶段准出 / 推荐能力 / README 结构一致性） | `template/` 结构、状态字段、模板清单、阶段准出与推荐能力 |
+| `scripts/validate.sh` | 完整性校验（状态结构、清单一致性、阶段准出 / 推荐能力 / README 结构一致性） | `template/` 结构、状态字段、模板清单、阶段准出与推荐能力 |
 | `scripts/gen-manifest.sh` | 生成/校验模板清单 | `VERSION`、`template/.trae/template-manifest.json`、`validate.sh` |
 | `VERSION` | 模板版本单一数据源 | `scripts/gen-manifest.sh`、`CONTRIBUTING.md` 发版流程 |
 | `scripts/setup-labels.sh` | 同步 PR 标签（供 release notes 归类） | `.github/release.yml`、`CONTRIBUTING.md` 标签约定 |

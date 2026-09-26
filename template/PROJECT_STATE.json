@@ -16,6 +16,7 @@
       "status": "in_progress",
       "started_at": "2026-09-26",
       "completed_at": null,
+      "decision": "pending",
       "checklist": [
         {
           "item": "完成背景、目标用户与竞品调研，输出研究结论",
@@ -113,5 +114,5 @@
     }
   },
   "last_updated": "2026-09-26",
-  "template_version": "0.6.1"
+  "template_version": "0.7.0"
 }
