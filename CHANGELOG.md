@@ -4,6 +4,18 @@
 
 ## [Unreleased]
 
+### Added
+- `scripts/validate.sh` 新增第 9 节「阶段准出一致性」：强制校验门控（`PROJECT_STATE.json` 的 checklist）与 `AGENTS.md`、四个阶段 README、两张阶段产物汇总表五处描述一致
+
+### Changed
+- 对齐阶段准出的五处描述与实际门控（此前同一组产物在各处的成分互不相同）：
+  - 调研：`PROJECT_STATE.json` 中两项同指 `research.md` 的重复清单项合并为一项
+  - 设计：两张汇总表补上 `architecture.html`
+  - 开发：门控补上独立的 `tests/` 项；`AGENTS.md` 准出补上 `plan.md`、`src/`
+  - 运营：门控与两张汇总表补上 `monitoring.md`；`AGENTS.md` 准出改为 `deploy.md` + `runbook.md` + `release-notes.md` + `monitoring.md`
+- `template/README.md` 标题「三个命令」更正为「四个命令」（上一版加入 `/upgrade` 时漏改）
+- `VERSION` 推进至 `0.3.0`：载荷已改动，而升级工具在「版本相同」时会短路，不推进会导致改动静默升不上去。该约束已写入 `CONTRIBUTING.md` 与升级工具规格 §5
+
 ## [0.2.0] - 2026-09-26
 
 ### Added

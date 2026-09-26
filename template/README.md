@@ -2,7 +2,7 @@
 
 本项目按 **调研 → 设计 → 执行(开发) → 上线运营** 四阶段推进，流程规范见 [AGENTS.md](AGENTS.md)，当前进度见 [PROJECT_STATE.json](PROJECT_STATE.json)。
 
-## 三个命令
+## 四个命令
 
 | 命令 | 用途 |
 |------|------|
@@ -22,9 +22,9 @@
 | 阶段 | 目录 | 关键产物 |
 |------|------|----------|
 | 调研 | `00-discovery/` | `research.md`、`decision.md` |
-| 设计 | `01-design/` | `product-spec.md`、`tech-design.md` |
-| 执行 | `02-development/` | `plan.md`、代码、测试、`changelog.md` |
-| 运营 | `03-operations/` | `deploy.md`、`runbook.md`、`release-notes.md` |
+| 设计 | `01-design/` | `product-spec.md`、`tech-design.md`、`architecture.html` |
+| 执行 | `02-development/` | `plan.md`、`src/`、`tests/`、`changelog.md` |
+| 运营 | `03-operations/` | `deploy.md`、`runbook.md`、`release-notes.md`、`monitoring.md` |
 
 各阶段的准入条件、推荐工具与准出产物，见对应目录下的 `README.md`。
 

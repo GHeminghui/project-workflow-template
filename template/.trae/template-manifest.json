@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "template_name": "project-workflow-template",
-  "template_version": "0.2.0",
+  "template_version": "0.3.0",
   "files": [
     {
       "path": ".gitignore",
@@ -49,20 +49,20 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "d7e784b2ce7b631f2a1dba02ec8f791e762116794fbde519846b9e4ffe780af2"
+      "sha256": "3d6a9bf917dcf901a6d361216d4b52183663e290ede572bfa7414cc04fa8e32d"
     },
     {
       "path": "PROJECT_STATE.json",
-      "sha256": "cf8c31cf041283ad555ab24944b48211097250ab1c5acec7de5333f45f802b00",
+      "sha256": "bc32f53e64f967c627a74fe67d447cd5695de15fd485a4b533f79256e739af56",
       "mode": "create-only"
     },
     {
       "path": "README.md",
-      "sha256": "00735e4e5f180e752812c794b0a1983fd7c1a166f8b15c1daf3577bd02c972f2"
+      "sha256": "9735e92ae739d94186211acdec6b55ed3121ee397ac7d6e56d7f90fe262ff434"
     },
     {
       "path": "docs/README.md",
-      "sha256": "6b30fc262d5eb05e31014491585ccd395243128e1e37c1dce23f5925d398dc45"
+      "sha256": "6ee435109c00bd05049ab8601c41ea0bb77d9b695b0f65a3942e110082b0968c"
     },
     {
       "path": "docs/adr/000-template.md",

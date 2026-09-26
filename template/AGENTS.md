@@ -23,17 +23,17 @@
 ### 设计 (design) — 目录 `01-design/`
 - 目标：把需求转化为可执行方案（产品设计 + 技术设计）
 - 推荐能力：brainstorming、Praxis:design、whiteboard、visualize-code、Frontend Design
-- 准出：`product-spec.md` + `tech-design.md` + 架构图完成
+- 准出：`product-spec.md` + `tech-design.md` + `architecture.html`
 
 ### 执行(开发) (development) — 目录 `02-development/`
 - 目标：把设计变成可运行、可测试的代码
 - 推荐能力：writing-plans、test-driven-development、Praxis:tdd、browser_use、RunCommand
-- 准出：全量测试通过 + `changelog.md` 更新
+- 准出：`plan.md` + `src/` + `tests/`（全量通过）+ `changelog.md`
 
 ### 上线运营 (operations) — 目录 `03-operations/`
 - 目标：部署上线并持续监控、迭代
 - 推荐能力：Praxis:ship、Praxis:release、verification-before-completion
-- 准出：`deploy.md` + `runbook.md` + 上线验证完成
+- 准出：`deploy.md` + `runbook.md` + `release-notes.md` + `monitoring.md`
 
 ## 目录结构
 

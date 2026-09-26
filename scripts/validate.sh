@@ -172,6 +172,115 @@ else
   fi
 fi
 
+section "9. 阶段准出一致性（门控 ↔ AGENTS.md ↔ 阶段 README ↔ 汇总表）"
+if command -v python3 >/dev/null 2>&1; then
+  OUT=$(python3 - "$TEMPLATE" <<'PY'
+import json
+import os
+import re
+import sys
+
+template = sys.argv[1]
+STAGES = [("discovery", "00-discovery"), ("design", "01-design"),
+          ("development", "02-development"), ("operations", "03-operations")]
+
+
+def norm(tokens):
+    out = set()
+    for t in tokens:
+        t = t.strip().strip("`").strip().rstrip("/")
+        if t:
+            out.add(t)
+    return out
+
+
+def backticks(text):
+    return re.findall(r"`([^`]+)`", text)
+
+
+# 基准：门控（PROJECT_STATE.json 的 checklist artifact）
+with open(os.path.join(template, "PROJECT_STATE.json"), encoding="utf-8") as f:
+    state = json.load(f)
+gates = {
+    key: norm([os.path.basename(i["artifact"]) for i in state["stages"][key]["checklist"]])
+    for key, _ in STAGES
+}
+
+sources = {}
+
+# 阶段 README 的「准出产物」
+readme = {}
+for key, d in STAGES:
+    names = []
+    with open(os.path.join(template, d, "README.md"), encoding="utf-8") as f:
+        for line in f:
+            m = re.match(r"^- \[ \] `([^`]+)`", line.strip())
+            if m:
+                names.append(m.group(1))
+    readme[key] = norm(names)
+sources["阶段 README"] = readme
+
+# AGENTS.md 阶段说明里的「准出」行
+with open(os.path.join(template, "AGENTS.md"), encoding="utf-8") as f:
+    agents_text = f.read()
+agents = {}
+for key, d in STAGES:
+    sec = re.search(r"^###[^\n]*" + re.escape(d) + r"[^\n]*\n(.*?)(?=\n###|\n##|\Z)",
+                    agents_text, re.S | re.M)
+    names = []
+    if sec:
+        m = re.search(r"^- 准出：(.*)$", sec.group(1), re.M)
+        if m:
+            names = backticks(m.group(1))
+    agents[key] = norm(names)
+sources["AGENTS.md"] = agents
+
+# 两张「阶段产物」汇总表，按目录列定位阶段
+for rel in ["README.md", "docs/README.md"]:
+    table = {}
+    with open(os.path.join(template, rel), encoding="utf-8") as f:
+        for line in f:
+            if not line.strip().startswith("|"):
+                continue
+            cols = [c.strip() for c in line.strip().strip("|").split("|")]
+            if len(cols) < 3:
+                continue
+            d = cols[1].strip().strip("`").rstrip("/")
+            for key, dd in STAGES:
+                if d == dd:
+                    table[key] = norm(cols[2].replace("、", " ").split())
+    sources[rel] = table
+
+errors = []
+for name, src in sources.items():
+    for key, d in STAGES:
+        got = src.get(key, set())
+        if got != gates[key]:
+            detail = []
+            if gates[key] - got:
+                detail.append("缺 " + "、".join(sorted(gates[key] - got)))
+            if got - gates[key]:
+                detail.append("多 " + "、".join(sorted(got - gates[key])))
+            errors.append(f"{name} 的 {key}（{d}/）: " + "；".join(detail))
+
+if errors:
+    for e in errors:
+        print("  ❌ " + e)
+    print("  门控以 PROJECT_STATE.json 的 checklist 为准；请让四处描述与它一致")
+    sys.exit(1)
+sys.exit(0)
+PY
+)
+  if [[ $? -eq 0 ]]; then
+    ok "门控与 AGENTS.md、阶段 README、两张汇总表描述一致"
+  else
+    bad "阶段准出在文档间不一致（门控才是真正生效的那层）"
+    echo "$OUT" | sed 's/^/     /'
+  fi
+else
+  bad "未找到 python3，跳过"
+fi
+
 echo
 echo "========================================"
 echo "  校验结果: 通过 $PASS 项，失败 $FAIL 项"
