@@ -23,6 +23,7 @@ required=(
   "template/README.md"
   "template/.gitignore"
   "template/.trae/hooks.json"
+  "template/.trae/template-manifest.json"
   "template/.trae/scripts/inject_status.py"
   "template/.trae/commands/init-project.md"
   "template/.trae/commands/status.md"
@@ -35,13 +36,16 @@ required=(
   "template/03-operations/README.md"
   "scripts/install.sh"
   "scripts/setup-global.sh"
+  "scripts/gen-manifest.sh"
   "AGENTS.md"
   "README.md"
   "CHANGELOG.md"
   "CONTRIBUTING.md"
   "LICENSE"
+  "VERSION"
   "docs/design.md"
   "docs/architecture.md"
+  "docs/specs/template-manifest.md"
 )
 for f in "${required[@]}"; do
   [[ -e "$REPO_ROOT/$f" ]] && ok "$f" || bad "缺失: $f"
@@ -115,7 +119,7 @@ done
 [[ $leaked -eq 0 ]] && ok "载荷未泄漏开发层内容"
 
 section "5. 脚本语法与可执行性"
-for s in "scripts/install.sh" "scripts/setup-global.sh" "scripts/validate.sh" "tests/test_install.sh"; do
+for s in "scripts/install.sh" "scripts/setup-global.sh" "scripts/build-dist.sh" "scripts/gen-manifest.sh" "scripts/validate.sh" "tests/test_install.sh"; do
   if [[ -f "$REPO_ROOT/$s" ]]; then
     bash -n "$REPO_ROOT/$s" 2>/dev/null && ok "$s 语法正确" || bad "$s 语法错误"
   fi
@@ -141,6 +145,18 @@ if command -v python3 >/dev/null 2>&1; then
     ok "inject_status.py 输出正常"
   else
     bad "inject_status.py 输出异常: $OUT"
+  fi
+fi
+
+section "8. 模板清单一致性（清单 ↔ 载荷 ↔ 版本号）"
+if [[ ! -f "$REPO_ROOT/scripts/gen-manifest.sh" ]]; then
+  bad "缺少 scripts/gen-manifest.sh"
+else
+  if OUT=$(bash "$REPO_ROOT/scripts/gen-manifest.sh" --check 2>&1); then
+    ok "清单与载荷、版本号一致"
+  else
+    bad "模板清单与载荷不一致（会导致升级时误判文件改动）"
+    echo "$OUT" | sed 's/^/     /'
   fi
 fi
 

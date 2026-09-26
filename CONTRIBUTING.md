@@ -60,12 +60,30 @@
 
 ## 发布
 
-发布由 `.github/workflows/release.yml` 自动完成，只需打 tag 并推送：
+`VERSION` 是模板版本的**单一数据源**，`template/.trae/template-manifest.json` 与
+`template/PROJECT_STATE.json` 里的版本号都由它派生。因此发布前必须先对齐版本：
 
-```bash
-git tag v0.2.0
-git push origin v0.2.0
-```
+1. 把 `CHANGELOG.md` 的 `[Unreleased]` 归入新版本段，如 `## [0.2.0] - YYYY-MM-DD`
+2. 把根目录 `VERSION` 改为同一版本号，如 `0.2.0`
+3. 重新生成模板清单（会一并同步 `template/PROJECT_STATE.json` 的版本号）：
+
+   ```bash
+   bash scripts/gen-manifest.sh
+   ```
+
+4. 本地验证 —— `validate.sh` 第 8 节会强制校验「`VERSION` ↔ 清单 ↔ 载荷哈希」三者一致，
+   漏做第 2、3 步会在这里被拦下：
+
+   ```bash
+   bash scripts/validate.sh && bash tests/test_install.sh
+   ```
+
+5. 提交后打 tag 并推送：
+
+   ```bash
+   git tag v0.2.0
+   git push origin v0.2.0
+   ```
 
 工作流会自动执行：发布前校验与测试 → 构建 `dist/` 产物 → 产物自检 → 创建 GitHub Release，
 并附上 `bootstrap.sh`、`project-workflow-template.tar.gz`、`project-workflow-template.zip` 三个产物。
@@ -82,6 +100,14 @@ git push origin v0.2.0
 
 > 📌 两个 `release.yml` 不要混淆：`.github/release.yml` 是 **Release notes 分类配置**（GitHub 官方约定文件名），
 > `.github/workflows/release.yml` 是**发布工作流本体**。前者被 GitHub 读取用于归类 notes，不参与任何构建。
+
+## Shell 约定
+
+- 脚本中变量名后**紧接全角字符**时，必须写成 `${VAR}`，不能用 `$VAR`。
+  原因：macOS 自带的 bash 3.2 会把高位字节（≥ `0x80`）并入变量名，导致
+  `$rel（用户数据…）` 被解析为变量 `rel<0xEF>` 并触发 `set -u` 报错。CI 的
+  macOS runner 正是 bash 3.2，因此这个错误必现。
+- 新增脚本需同时登记到 `scripts/validate.sh` 第 1 节（必需文件）与第 5 节（语法检查）。
 
 ## 决策记录
 

@@ -26,7 +26,7 @@ TARGET="$WORK/my-app"
 bash "$REPO_ROOT/scripts/install.sh" "$TARGET" >/dev/null 2>&1
 [[ -d "$TARGET" ]] && ok "目标目录已创建" || bad "目标目录未创建"
 for f in AGENTS.md PROJECT_STATE.json .gitignore \
-         .trae/hooks.json .trae/scripts/inject_status.py \
+         .trae/hooks.json .trae/template-manifest.json .trae/scripts/inject_status.py \
          .trae/commands/init-project.md .trae/commands/status.md .trae/commands/advance.md \
          docs/README.md docs/adr/000-template.md \
          00-discovery/README.md 01-design/README.md 02-development/README.md 03-operations/README.md; do
@@ -34,7 +34,7 @@ for f in AGENTS.md PROJECT_STATE.json .gitignore \
 done
 [[ -d "$TARGET/.git" ]] && ok "已初始化 git" || bad "未初始化 git"
 
-section "2. 状态文件被正确写入"
+section "2. 状态文件与模板清单被正确写入"
 if command -v python3 >/dev/null 2>&1; then
   OUT=$(python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
 import json, sys
@@ -43,8 +43,23 @@ print(d["project_name"])
 PY
 )
   [[ "$OUT" == "my-app" ]] && ok "project_name = my-app" || bad "project_name 异常: $OUT"
+
+  EXPECTED_VERSION="$(tr -d '[:space:]' < "$REPO_ROOT/VERSION")"
+  OUT=$(python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
+import json, sys
+print(json.load(open(sys.argv[1], encoding="utf-8")).get("template_version", "<缺失>"))
+PY
+)
+  [[ "$OUT" == "$EXPECTED_VERSION" ]] && ok "template_version = $EXPECTED_VERSION" || bad "template_version 异常: ${OUT}（期望 ${EXPECTED_VERSION}）"
 else
   bad "未找到 python3，跳过"
+fi
+
+assert_file "已安装模板清单" "$TARGET/.trae/template-manifest.json"
+if cmp -s "$TARGET/.trae/template-manifest.json" "$REPO_ROOT/template/.trae/template-manifest.json"; then
+  ok "安装的清单与载荷逐字节一致（基线可用）"
+else
+  bad "安装的清单与载荷不一致"
 fi
 
 section "3. 状态注入脚本可运行"
