@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "template_name": "project-workflow-template",
-  "template_version": "0.3.0",
+  "template_version": "0.4.0",
   "files": [
     {
       "path": ".gitignore",
@@ -9,7 +9,7 @@
     },
     {
       "path": ".trae/commands/advance.md",
-      "sha256": "af95c67c8c5b5d83dad1abb5b4ded6d894eaaf483d41b774ffdd479b521e33d0"
+      "sha256": "42bee90fb385c6314319fef140abb747a720ca4bc9dcadcbcdba2d58db5faefe"
     },
     {
       "path": ".trae/commands/init-project.md",
@@ -17,7 +17,7 @@
     },
     {
       "path": ".trae/commands/status.md",
-      "sha256": "6bafe9ec0ee9207b9972002bf2f2fd456292041e232bfa33747be9d32817248a"
+      "sha256": "3640ac22fe485f7ad46de52498bca4b389ed4586e8e9ff0806522fc5d9f56bf2"
     },
     {
       "path": ".trae/commands/upgrade.md",
@@ -29,11 +29,11 @@
     },
     {
       "path": ".trae/scripts/inject_status.py",
-      "sha256": "61a3b28e0a683a1fc5d5ed64fc076dde243ffcfd2b743500f3bcbc2fe4dfdc0e"
+      "sha256": "179087efef0fd929ffd65d9d363905b267266e69bc64329103ef0efba0642da2"
     },
     {
       "path": "00-discovery/README.md",
-      "sha256": "5e58872eccf0bbdc9707d4c61ead9710252a08417794a1829287a84453f1a0a8"
+      "sha256": "a1fe7d1475e246b6e4a183217f145598424078ba20248deb76f5faf235bcdd1b"
     },
     {
       "path": "01-design/README.md",
@@ -41,24 +41,24 @@
     },
     {
       "path": "02-development/README.md",
-      "sha256": "014af06e27d1218255f1925d60a5daa1c299c72f03c5619c03b8cf02f7fd756b"
+      "sha256": "75752bcf4de8c37dc3fa6c50a90f57121aed0ea0b41e4f4e2500ed0a683a163e"
     },
     {
       "path": "03-operations/README.md",
-      "sha256": "e5042ace4f85dc5375d612c5ae2a7f50038ef4ebe4cbe32b29fd3d6d485f32e3"
+      "sha256": "aee31434fa6e60cb8e68d32dd2f00cf3149ae68d50589318e759467685546df0"
     },
     {
       "path": "AGENTS.md",
-      "sha256": "3d6a9bf917dcf901a6d361216d4b52183663e290ede572bfa7414cc04fa8e32d"
+      "sha256": "717fcfc0106aedc3ee320dd8c11a4679086cad38efb73732869cdb443c8c722b"
     },
     {
       "path": "PROJECT_STATE.json",
-      "sha256": "bc32f53e64f967c627a74fe67d447cd5695de15fd485a4b533f79256e739af56",
+      "sha256": "f7f77f07adaecabc5ded18efd1fa8634e2037b02df0c36310c7733c15a4fcbee",
       "mode": "create-only"
     },
     {
       "path": "README.md",
-      "sha256": "9735e92ae739d94186211acdec6b55ed3121ee397ac7d6e56d7f90fe262ff434"
+      "sha256": "a18fc8475f2276c5113a0e4bbf45164c0ac25bb499af428f86155e8fd9168182"
     },
     {
       "path": "docs/README.md",

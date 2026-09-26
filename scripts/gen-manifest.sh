@@ -19,7 +19,7 @@ CHECK=0
 if [[ "${1:-}" == "--check" ]]; then
   CHECK=1
 elif [[ -n "${1:-}" ]]; then
-  echo "未知选项: $1（仅支持 --check）" >&2
+  echo "未知选项: ${1}（仅支持 --check）" >&2
   exit 1
 fi
 

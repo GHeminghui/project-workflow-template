@@ -163,7 +163,7 @@ elif name_given and data.get("project_name") != name:
     changed = True
     print(f"    已更新 project_name: {old} -> {name}（进度字段未改动）")
 else:
-    print("    保留原有状态：current_stage / checklist / deliverables 均未改动")
+    print("    保留原有状态：current_stage / checklist 等进度字段均未改动")
 
 if changed:
     with open(path, "w", encoding="utf-8") as f:
