@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+### Changed
+- `CONTRIBUTING.md` 新增「分支保护」章节，固化 `main` 的 Rulesets 保护策略：要求 PR（`Required approvals` 填 0）+ CI 通过（两条矩阵检查名已列明）+ 禁强推/禁删除，Admin bypass 设为 **Always**；并写明「发布提交直推 `main`」是唯一例外；「发布」第 5 步同步写明该直推流程
+
 ## [0.5.0] - 2026-09-26
 
 ### Added
