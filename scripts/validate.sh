@@ -72,9 +72,12 @@ if command -v python3 >/dev/null 2>&1; then
 import json, sys
 data = json.load(open(sys.argv[1], encoding="utf-8"))
 errs = []
-for key in ("project_name", "current_stage", "stage_order", "stages", "last_updated"):
+for key in ("project_name", "project_status", "current_stage", "stage_order", "stages", "last_updated"):
     if key not in data:
         errs.append(f"缺少字段: {key}")
+if data.get("project_status") not in ("active", "rejected", "archived"):
+    errs.append("project_status 取值非法: "
+                f"{data.get('project_status')!r}（应为 active / rejected / archived）")
 order = data.get("stage_order", [])
 stages = data.get("stages", {})
 if order != ["discovery", "design", "development", "operations"]:

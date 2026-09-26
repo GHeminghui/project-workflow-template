@@ -14,7 +14,6 @@
   - 开发：门控补上独立的 `tests/` 项；`AGENTS.md` 准出补上 `plan.md`、`src/`
   - 运营：门控与两张汇总表补上 `monitoring.md`；`AGENTS.md` 准出改为 `deploy.md` + `runbook.md` + `release-notes.md` + `monitoring.md`
 - `template/README.md` 标题「三个命令」更正为「四个命令」（上一版加入 `/upgrade` 时漏改）
-- `VERSION` 推进至 `0.3.0`：载荷已改动，而升级工具在「版本相同」时会短路，不推进会导致改动静默升不上去。该约束已写入 `CONTRIBUTING.md` 与升级工具规格 §5
 - **状态文件只保留不可派生的字段**：删除 `next_action` 与各阶段 `deliverables`，改为现场派生
   - Hook 注入的「下一步动作」现取当前阶段第一个未完成的 checklist 项，不再可能陈旧
   - `/status` 的「下一步动作」与「已完成交付物」均现场派生
@@ -24,7 +23,14 @@
 - `AGENTS.md` 新增约束：勾选某项前先确认其 `artifact` 已真实产出
 - 修正「交付给下一阶段」的产物归属：调研的需求清单明确落在 `research.md`；开发阶段不再承诺「部署说明」（该文件归运营阶段）
 - `scripts/validate.sh` 第 9 节扩展为同时校验阶段显示名（AGENTS.md 标题、阶段 README 标题、两张汇总表共 4 处比对 `stages[].name`）
-- `VERSION` 推进至 `0.4.0`：载荷再次改动，版本号仍须前进以避开升级工具的「版本相同」短路
+- **给项目加生命周期终态 `project_status`**（与阶段链正交，不引入回路）：`active` / `rejected`（调研 No-Go 终止）/ `archived`（四阶段完成归档）
+  - `/advance` 在 discovery 阶段确认 No-Go 后置为 `rejected` 并停止推进；在 operations 完成后经用户同意置为 `archived`
+  - Hook 在非 `active` 时只提示状态、不再推动阶段；`/status` 展示项目状态
+  - 此前「归档」与「No-Go」两处承诺都没有可表示的终态——`/advance` 说「询问是否需要归档」，却没有任何可写入的字段
+- **把「迭代」从阶段目标降级为明确的非目标**：运营阶段目标改为「部署上线并持续监控运行」；`AGENTS.md` 新增「关于迭代」（迭代请新建项目周期，不在流程内回退阶段）；`docs/design.md` 的**非目标**补充「不做阶段回退与迭代循环」与「不做需求裁剪（N/A）机制」
+  - 原因：原目标写着「持续监控、迭代」，而 `/advance` 只能向前，两处说法矛盾
+- `docs/design.md` 的「阶段门控的设计」补记产物存在性核对（上一版实现后漏更）
+- `VERSION` 推进至 `0.5.0`：本段改动多次触及载荷，每次都必须推进版本号以避开升级工具的「版本相同」短路（该约束见 `CONTRIBUTING.md` 与升级工具规格 §5）
 
 ### Fixed
 - `scripts/validate.sh` 修复一处 **bash 3.2 专属**语法错误：`$()` 内嵌 heredoc 正文中的字面反引号被误解析（改用 `chr(96)`）。该写法在 Linux 的 bash 5 下不报错，只在 macOS 的 bash 3.2 下必现；相应约定已记入 `CONTRIBUTING.md`

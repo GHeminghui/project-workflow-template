@@ -44,6 +44,13 @@ PY
 )
   [[ "$OUT" == "my-app" ]] && ok "project_name = my-app" || bad "project_name 异常: $OUT"
 
+  OUT=$(python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
+import json, sys
+print(json.load(open(sys.argv[1], encoding="utf-8")).get("project_status", "<缺失>"))
+PY
+)
+  [[ "$OUT" == "active" ]] && ok "project_status = active" || bad "project_status 异常: $OUT"
+
   EXPECTED_VERSION="$(tr -d '[:space:]' < "$REPO_ROOT/VERSION")"
   OUT=$(python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
 import json, sys
@@ -99,6 +106,24 @@ import json, sys
 p = sys.argv[1]
 d = json.load(open(p, encoding="utf-8"))
 d["stages"]["discovery"]["checklist"][0]["done"] = False
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+PY
+# 归档状态：Hook 只提示状态，不再推动阶段
+python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
+import json, sys
+p = sys.argv[1]
+d = json.load(open(p, encoding="utf-8"))
+d["project_status"] = "archived"
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+PY
+OUT3=$(TRAE_PROJECT_DIR="$TARGET" python3 "$TARGET/.trae/scripts/inject_status.py" 2>&1 || true)
+echo "$OUT3" | grep -q "已归档" && ok "归档状态被渲染" || bad "归档状态未渲染: ${OUT3}"
+echo "$OUT3" | grep -q "^下一步动作:" && bad "归档后仍推动阶段" || ok "归档后不再推动阶段"
+python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
+import json, sys
+p = sys.argv[1]
+d = json.load(open(p, encoding="utf-8"))
+d["project_status"] = "active"
 json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 PY
 

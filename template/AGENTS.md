@@ -31,7 +31,7 @@
 - 准出：`plan.md` + `src/` + `tests/`（全量通过）+ `changelog.md`
 
 ### 运营 (operations) — 目录 `03-operations/`
-- 目标：部署上线并持续监控、迭代
+- 目标：部署上线并持续监控运行
 - 推荐能力：Praxis:ship、Praxis:release、verification-before-completion
 - 准出：`deploy.md` + `runbook.md` + `release-notes.md` + `monitoring.md`
 
@@ -51,3 +51,15 @@ PROJECT_STATE.json 项目状态（单一数据源）
 
 - `PROJECT_STATE.json` 是**唯一状态数据源**，任何阶段推进、checklist 勾选都必须更新它。
 - 每次更新后同步刷新 `last_updated` 字段；「下一步动作」由当前阶段第一个未完成的 checklist 项派生，无需手写。
+- `project_status` 表示项目生命周期：`active`（进行中）、`rejected`（调研阶段 No-Go，流程终止）、`archived`（四阶段完成并归档）。**非 `active` 时不得继续推进阶段。**
+
+## 关于迭代
+
+本流程**刻意保持线性**：不做阶段回退，也不做迭代循环。运营阶段的目标是「部署上线并持续监控运行」，不含回到设计或开发的通路。
+
+上线后如需迭代，请按以下方式处理，而不是在流程内回退阶段：
+
+- **新一轮迭代** → 为本轮变更**新建一个项目周期**，让它独立走完四阶段
+- **同一项目内的紧急修补** → 人工把 `project_status` 改回 `active`，并按需要把 `current_stage` 调回对应阶段，同时自行核对状态与产物是否一致
+
+这样取舍的理由：线性流程「简单、可预测、不跳步」是这套模板的核心价值；引入回路会让门控与状态判断显著复杂化。
