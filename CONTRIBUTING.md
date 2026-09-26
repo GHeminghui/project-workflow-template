@@ -52,6 +52,10 @@ git push origin v0.2.0
 - 发布前请确认 `CHANGELOG.md` 的 `[Unreleased]` 已归入对应版本段
 - 需要重跑时，可在 Actions 页面手动触发 `Release` 工作流并填入已存在的 tag（步骤幂等，会覆盖同名资产）
 
+> ⚠️ **tag 所指的提交必须已包含 `.github/workflows/release.yml`**，否则 GitHub 不会触发发布工作流，也就不会创建 Release。
+> GitHub Actions 对 push 事件只读取触发该事件的 ref 中实际存在的工作流文件，因此给工作流引入之前的历史提交补 tag 时，
+> 不会自动发布，需改用 Actions 页面的手动触发（填入该已存在的 tag）。
+
 ## 决策记录
 
 涉及架构级选择（例如改变状态文件格式、增减阶段）时，请在 `docs/adr/` 新增一条记录，说明背景、备选方案与后果。

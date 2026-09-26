@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+### Changed
+- `CONTRIBUTING.md` 发布小节补充注意事项：tag 所指提交必须已包含 `.github/workflows/release.yml`，否则不会触发发布工作流
+
 ## [0.1.1] - 2026-09-26
 
 ### Added
