@@ -21,12 +21,29 @@ description: 将项目推进到下一阶段（要求当前阶段 checklist 全�
    - `current_stage` 更新为下一阶段
    - `last_updated` 更新为当前日期
 7. 保存 `PROJECT_STATE.json`
-8. 用 `git add PROJECT_STATE.json && git commit -m "chore: advance to <下一阶段>"` 提交阶段推进（若在 git 仓库中）
+8. **提交本阶段成果**（若在 git 仓库中）——产物与状态一并入库，**不要只提交状态文件**：
+
+   ```bash
+   git add "<当前阶段目录>/" docs/ PROJECT_STATE.json
+   git commit -m "chore: 完成<当前阶段名>阶段并推进到<下一阶段名>"
+   ```
+
+   - `<当前阶段目录>` 即当前阶段对应的目录（如调研阶段为 `00-discovery/`）
+   - 一并加入 `docs/` 是为了带上本阶段新增的 ADR（见 `AGENTS.md` 规则 6）
+   - **为什么必须连产物一起提交**：状态文件会宣告本阶段「完成」，若产物没入库，版本库里就查不到实物——换机器、回滚或评审时都会丢
 
 **若当前已是最后一个阶段（operations）且 checklist 全部完成**：不要再去寻找下一阶段，改为：
 
 - 把 `operations.status` 设为 `done` 并填写 `completed_at`
 - 询问用户是否归档；若用户同意，把 `project_status` 设为 `archived`
-- 刷新 `last_updated` 并保存，然后告知用户项目已完成（以及是否已归档）
+- 刷新 `last_updated` 并保存
+- 同样把**产物与状态一并提交**（若在 git 仓库中）：
+
+  ```bash
+  git add "03-operations/" docs/ PROJECT_STATE.json
+  git commit -m "chore: 完成运营阶段并归档"
+  ```
+
+- 然后告知用户项目已完成（以及是否已归档）
 
 完成后，向用户说明已推进到哪个阶段、该阶段的目标和下一步要做什么。

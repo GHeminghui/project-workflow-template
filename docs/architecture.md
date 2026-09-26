@@ -86,7 +86,7 @@ AI 读取 PROJECT_STATE.json
               · 刷新 last_updated
                   │
                   ▼
-              写入 PROJECT_STATE.json + git commit
+              提交本阶段产物 + PROJECT_STATE.json（git commit，二者一并入库）
                   │
                   ▼
               告知用户新阶段与下一步
