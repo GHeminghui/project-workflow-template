@@ -37,6 +37,7 @@ CHANGELOG.md         优化记录，每次改动都要追加
 CONTRIBUTING.md      贡献流程与约定
 docs/design.md       设计原理：为什么这么设计
 docs/architecture.md 各文件职责与数据流
+docs/specs/          接口与格式规格（如模板清单）
 docs/adr/            模板自身的架构决策记录（不是用户项目的）
 template/            【载荷】被安装到用户项目的内容
 scripts/install.sh   把 template/ 安装到目标项目
@@ -60,6 +61,7 @@ tests/               端到端测试
    ```
 4. **记录**变更到 `CHANGELOG.md`
 5. **涉及架构级决策**时，新增一条 `docs/adr/NNN-*.md`
+6. **涉及接口或格式契约**（如模板清单、状态结构）时，同步更新 `docs/specs/` 下的对应规格，并确保其 CI 校验通过
 
 ## 禁止事项
 

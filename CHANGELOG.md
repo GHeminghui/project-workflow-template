@@ -9,6 +9,8 @@
 - 新增 `.github/PULL_REQUEST_TEMPLATE.md`：PR 模板
 - 新增 `scripts/setup-labels.sh`：一键创建/同步 8 个 PR 标签（幂等，可重复执行）
 - 新增 `docs/adr/002-upgrade-strategy.md`（状态：已采纳）：模板升级策略，含版本锚点、文件边界声明化与默认只读的升级流程
+- 新增 `docs/specs/template-manifest.md`：冻结模板清单（`.trae/template-manifest.json`）的路径与格式，作为后续实现的接口契约
+- 新增 `docs/specs/` 目录与规格文档约定，`AGENTS.md` 改动工作流同步补充第 6 条
 
 ### Changed
 - `CONTRIBUTING.md` 新增「PR 与标签」标签约定，流程补充 PR 步骤，并说明两个 `release.yml` 的区别

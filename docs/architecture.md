@@ -8,7 +8,11 @@
 project-workflow-template/          仓库根 = 开发层
 ├── AGENTS.md                       开发指引（TRAE 打开本仓库时自动加载）
 ├── README.md / CHANGELOG.md / CONTRIBUTING.md / LICENSE
-├── docs/                           设计原理、架构、ADR
+├── docs/                           开发层文档
+│   ├── design.md                   设计原理
+│   ├── architecture.md             架构与数据流（本文件）
+│   ├── specs/                      接口与格式规格
+│   └── adr/                        架构决策记录
 ├── scripts/                        维护与安装脚本
 │   ├── install.sh                  安装载荷到目标项目（路径自适应）
 │   ├── setup-global.sh             全局安装（载荷 + 命令）
@@ -149,6 +153,7 @@ Release 页面：按 PR 标签归类的 notes + 三个分发产物
 | `.github/workflows/release.yml` | 发布（tag 触发打包与 Release） | `scripts/build-dist.sh`、tag 命名规范 |
 | `.github/release.yml` | Release notes 分类配置（按 PR 标签归类） | `CONTRIBUTING.md` 的标签约定 |
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR 模板 | `CONTRIBUTING.md` 的流程与标签约定 |
+| `docs/specs/template-manifest.md` | 模板清单的路径与格式规格 | `scripts/install.sh`、升级工具、清单一致性校验 |
 
 ## 4. 路径自适应约定
 

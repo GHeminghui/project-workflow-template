@@ -24,6 +24,7 @@
 ├── docs/
 │   ├── design.md       设计原理
 │   ├── architecture.md 架构与数据流
+│   ├── specs/          接口与格式规格
 │   └── adr/            模板自身的决策记录
 ├── .github/            仓库级配置
 │   ├── workflows/      ci.yml 校验与测试、release.yml 打包发布
