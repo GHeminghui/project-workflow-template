@@ -16,6 +16,7 @@
 #   - 默认只读，且永不交互（同时供人与 AI 通过 /upgrade 调用）
 #   - 默认行为永远不会丢失用户内容
 #   - 路径自适应载荷：仓库内 -> ../template；全局模板目录内 -> 同级目录
+#   - 升级只作用于模板项目：目标不像项目（既无状态文件也无基线清单）时拒绝，--force 可越过
 
 set -euo pipefail
 
@@ -63,6 +64,18 @@ if [[ ! -d "$TARGET_DIR" ]]; then
   exit 2
 fi
 TARGET_DIR="$(cd "$TARGET_DIR" && pwd)"
+
+# 准入检查：升级只应作用于「模板项目」。若目标目录既无状态文件、也无基线清单，
+# 多半是把仓库根或任意目录误当成了项目——此时必须拒绝，否则 --apply 会把整套载荷写进去。
+IS_PROJECT=0
+if [[ -f "$TARGET_DIR/PROJECT_STATE.json" || -f "$TARGET_DIR/.trae/template-manifest.json" ]]; then
+  IS_PROJECT=1
+fi
+if [[ "$IS_PROJECT" -ne 1 && "$FORCE" -ne 1 ]]; then
+  echo "错误: 目标目录不像模板项目（既无 PROJECT_STATE.json，也无 .trae/template-manifest.json）: $TARGET_DIR" >&2
+  echo "      升级只应用于已由 /init-project 建立的项目；若确认要在此目录执行，请显式加 --force。" >&2
+  exit 2
+fi
 
 rc=0
 python3 - "$PAYLOAD" "$TARGET_DIR" "$APPLY" "$FORCE" <<'PY' || rc=$?
@@ -264,7 +277,10 @@ if not do_apply:
     print("  下一步: bash upgrade.sh --apply")
     if merge:
         print("  需要连「待合并」的文件一起覆盖时: bash upgrade.sh --apply --force")
+    # 预览模式：只要存在待处理项就是 1，与是否 --force 无关（规格 §6）
+    sys.exit(1)
 
+# 落盘模式：仍有「待合并」文件需人工介入时为 1
 sys.exit(1 if remaining_merge else 0)
 PY
 

@@ -6,6 +6,7 @@
 
 ### Added
 - `scripts/validate.sh` 新增第 13 节：校验 `/advance` 的提交步骤必须包含阶段产物（不能只提交状态文件），可识别单行 `&&` 写法
+- `tests/test_install.sh` 新增第 15 节：覆盖升级工具的准入检查（拒绝 / 不写入 / `--apply` 同样拒绝 / `--force` 放行 / 不误伤正常项目）
 
 ### Changed
 - `VERSION` 推进至 `0.6.1`（本段改动触及载荷）
@@ -13,6 +14,8 @@
 ### Fixed
 - **`/advance` 不再只提交状态文件**：此前第 8 步只 `git add PROJECT_STATE.json`，跑完四阶段后 13 个阶段产物与 ADR 全部留在版本库外——状态宣告阶段「完成」，git 里却查不到实物（dogfooding 实测发现）。现改为连同阶段目录与 `docs/` 一并提交，末阶段归档同样处理
 - `AGENTS.md` 新增规则 8「阶段产物必须入库」；`docs/architecture.md` 的 `/advance` 数据流说明同步更新
+- **`upgrade.sh` 新增目标目录准入检查**：目标目录既无 `PROJECT_STATE.json` 也无 `.trae/template-manifest.json` 时默认**拒绝执行**（退出码 2，不写任何文件），`--force` 可越过——此前会把整套载荷写进任意目录（dogfooding 中实测发生：误传空目标使 cwd 落到仓库根，仓库根被写入 11 个载荷文件）。行为契约同步更新至 `docs/specs/upgrade-tool.md` §3.1
+- **`upgrade.sh --force` 预览模式的退出码修正**：此前 `--force` 预览即使发现差异也返回 `0`——落盘期概念 `remaining_merge` 被误用于退出码，与规格 §6「预览模式下发现差异 → 1」相矛盾。由 F2 新增的第 15 节测试发现
 
 ## [0.6.0] - 2026-09-26
 
