@@ -50,6 +50,7 @@ git push origin v0.2.0
 
 - tag 使用 `v<major>.<minor>.<patch>` 形式，与 `CHANGELOG.md` 的版本号对应
 - 发布前请确认 `CHANGELOG.md` 的 `[Unreleased]` 已归入对应版本段
+- 产物资内容以 **git 跟踪文件**为准（`scripts/build-dist.sh` 基于 `git ls-files`）：新增文件需先 `git add` 才会进入产物，未跟踪文件（如 `.DS_Store`）不会被打包
 - 需要重跑时，可在 Actions 页面手动触发 `Release` 工作流并填入已存在的 tag（步骤幂等，会覆盖同名资产）
 
 > ⚠️ **tag 所指的提交必须已包含 `.github/workflows/release.yml`**，否则 GitHub 不会触发发布工作流，也就不会创建 Release。

@@ -124,7 +124,7 @@ gh release create（--generate-notes --verify-tag）
 Release 页面附三个分发产物
 ```
 
-**关键点**：门控在打包之前，坏 tag 不会产出产物；Release 步骤幂等，失败重跑不会因「Release 已存在」二次报错。
+**关键点**：门控在打包之前，坏 tag 不会产出产物；Release 步骤幂等，失败重跑不会因「Release 已存在」二次报错。产物内容以 `git ls-files` 跟踪文件为准，未跟踪文件（如 `.DS_Store`）不会进入 `bootstrap.sh` 或压缩包，本地与 CI 构建结果一致。
 
 ## 3. 文件职责速查
 
@@ -138,7 +138,7 @@ Release 页面附三个分发产物
 | `scripts/install.sh` | 载荷分发 | `template/` 文件清单 |
 | `scripts/setup-global.sh` | 全局安装 | `commands/init-project.md` 引用路径 |
 | `scripts/validate.sh` | 完整性校验 | `template/` 结构与状态字段 |
-| `scripts/build-dist.sh` | 构建分发产物 | `.github/workflows/release.yml` |
+| `scripts/build-dist.sh` | 构建分发产物（以 git 跟踪文件为来源） | `.github/workflows/release.yml` |
 | `.github/workflows/ci.yml` | 持续集成（push/PR 校验与测试） | `scripts/validate.sh`、`tests/test_install.sh` |
 | `.github/workflows/release.yml` | 发布（tag 触发打包与 Release） | `scripts/build-dist.sh`、tag 命名规范 |
 

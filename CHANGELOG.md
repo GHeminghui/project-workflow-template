@@ -4,8 +4,13 @@
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-09-26
+
 ### Changed
 - `CONTRIBUTING.md` 发布小节补充注意事项：tag 所指提交必须已包含 `.github/workflows/release.yml`，否则不会触发发布工作流
+
+### Fixed
+- `scripts/build-dist.sh` 改为以 git 跟踪文件（`git ls-files`）为唯一来源，修复未跟踪文件（如 `template/.DS_Store`）被内嵌进 `bootstrap.sh` 与压缩包、进而污染用户项目的问题；并新增产物自检，条目与跟踪文件不一致时直接失败
 
 ## [0.1.1] - 2026-09-26
 
