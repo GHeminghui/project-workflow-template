@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-26
+
 ### Added
 - 新增 `.github/release.yml`：Release notes 分类配置，按 PR 标签归类
 - 新增 `.github/PULL_REQUEST_TEMPLATE.md`：PR 模板
