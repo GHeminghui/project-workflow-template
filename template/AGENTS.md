@@ -1,6 +1,6 @@
 # 项目工作流规范
 
-本项目遵循四阶段流程：**调研 → 设计 → 执行(开发) → 上线运营**。
+本项目遵循四阶段流程：**调研 → 设计 → 开发 → 运营**。
 所有工作必须在当前阶段内进行，按顺序推进，不得跳阶段。
 
 ## 核心规则（必须遵守）
@@ -11,7 +11,7 @@
 4. **不得越阶段操作**：例如设计阶段不得写生产代码，开发阶段不得擅自部署上线。
 5. **完成当前阶段全部 checklist 后**，提示用户运行 `/advance` 推进到下一阶段，不要自行推进。
 6. **关键决策**记录到 `docs/adr/`，使用轻量 ADR 格式（背景 / 决策 / 后果）。
-7. **产物落地到对应阶段目录**，路径以 `PROJECT_STATE.json` 中的 `artifact` 字段为准。
+7. **产物落地到对应阶段目录**，路径以 `PROJECT_STATE.json` 中的 `artifact` 字段为准；**勾选某项前，先确认该 `artifact` 已真实产出**。
 
 ## 阶段说明
 
@@ -25,12 +25,12 @@
 - 推荐能力：brainstorming、Praxis:design、whiteboard、visualize-code、Frontend Design
 - 准出：`product-spec.md` + `tech-design.md` + `architecture.html`
 
-### 执行(开发) (development) — 目录 `02-development/`
+### 开发 (development) — 目录 `02-development/`
 - 目标：把设计变成可运行、可测试的代码
 - 推荐能力：writing-plans、test-driven-development、Praxis:tdd、browser_use、RunCommand
 - 准出：`plan.md` + `src/` + `tests/`（全量通过）+ `changelog.md`
 
-### 上线运营 (operations) — 目录 `03-operations/`
+### 运营 (operations) — 目录 `03-operations/`
 - 目标：部署上线并持续监控、迭代
 - 推荐能力：Praxis:ship、Praxis:release、verification-before-completion
 - 准出：`deploy.md` + `runbook.md` + `release-notes.md` + `monitoring.md`
@@ -50,4 +50,4 @@ PROJECT_STATE.json 项目状态（单一数据源）
 ## 状态维护
 
 - `PROJECT_STATE.json` 是**唯一状态数据源**，任何阶段推进、checklist 勾选都必须更新它。
-- 每次更新后同步刷新 `last_updated` 和 `next_action` 字段。
+- 每次更新后同步刷新 `last_updated` 字段；「下一步动作」由当前阶段第一个未完成的 checklist 项派生，无需手写。

@@ -72,7 +72,7 @@ if command -v python3 >/dev/null 2>&1; then
 import json, sys
 data = json.load(open(sys.argv[1], encoding="utf-8"))
 errs = []
-for key in ("project_name", "current_stage", "stage_order", "stages", "next_action", "last_updated"):
+for key in ("project_name", "current_stage", "stage_order", "stages", "last_updated"):
     if key not in data:
         errs.append(f"缺少字段: {key}")
 order = data.get("stage_order", [])
@@ -205,39 +205,52 @@ gates = {
     key: norm([os.path.basename(i["artifact"]) for i in state["stages"][key]["checklist"]])
     for key, _ in STAGES
 }
+stage_names = {key: state["stages"][key].get("name", "") for key, _ in STAGES}
 
 sources = {}
 
 # 阶段 README 的「准出产物」
 readme = {}
+title_names = {}
 for key, d in STAGES:
-    names = []
+    items = []
+    title = ""
     with open(os.path.join(template, d, "README.md"), encoding="utf-8") as f:
         for line in f:
-            m = re.match(r"^- \[ \] `([^`]+)`", line.strip())
+            stripped = line.strip()
+            m = re.match(r"^- \[ \] `([^`]+)`", stripped)
             if m:
-                names.append(m.group(1))
-    readme[key] = norm(names)
+                items.append(m.group(1))
+            tm = re.match(r"^# 阶段 \d+：(.+?)（", stripped)
+            if tm:
+                title = tm.group(1)
+    readme[key] = norm(items)
+    title_names[key] = title
 sources["阶段 README"] = readme
 
 # AGENTS.md 阶段说明里的「准出」行
 with open(os.path.join(template, "AGENTS.md"), encoding="utf-8") as f:
     agents_text = f.read()
 agents = {}
+head_names = {}
 for key, d in STAGES:
     sec = re.search(r"^###[^\n]*" + re.escape(d) + r"[^\n]*\n(.*?)(?=\n###|\n##|\Z)",
                     agents_text, re.S | re.M)
-    names = []
+    items = []
     if sec:
         m = re.search(r"^- 准出：(.*)$", sec.group(1), re.M)
         if m:
-            names = backticks(m.group(1))
-    agents[key] = norm(names)
+            items = backticks(m.group(1))
+    agents[key] = norm(items)
+    hm = re.search(r"^### (\S+)[^\n]*" + re.escape(d), agents_text, re.M)
+    head_names[key] = hm.group(1) if hm else ""
 sources["AGENTS.md"] = agents
 
 # 两张「阶段产物」汇总表，按目录列定位阶段
+table_names = {}
 for rel in ["README.md", "docs/README.md"]:
     table = {}
+    label = {}
     with open(os.path.join(template, rel), encoding="utf-8") as f:
         for line in f:
             if not line.strip().startswith("|"):
@@ -249,7 +262,9 @@ for rel in ["README.md", "docs/README.md"]:
             for key, dd in STAGES:
                 if d == dd:
                     table[key] = norm(cols[2].replace("、", " ").split())
+                    label[key] = cols[0].strip().strip(chr(96))
     sources[rel] = table
+    table_names[rel] = label
 
 errors = []
 for name, src in sources.items():
@@ -263,6 +278,15 @@ for name, src in sources.items():
                 detail.append("多 " + "、".join(sorted(got - gates[key])))
             errors.append(f"{name} 的 {key}（{d}/）: " + "；".join(detail))
 
+# 阶段显示名：以 PROJECT_STATE.json 的 stages[].name 为权威来源
+for name, src in {**{"AGENTS.md 标题": head_names, "阶段 README 标题": title_names},
+                  **table_names}.items():
+    for key, d in STAGES:
+        got = src.get(key, "")
+        if got != stage_names[key]:
+            errors.append(f"{name} 的 {key}（{d}/）显示名不一致: "
+                          f"「{got}」≠ 状态文件「{stage_names[key]}」")
+
 if errors:
     for e in errors:
         print("  ❌ " + e)
@@ -275,6 +299,42 @@ PY
     ok "门控与 AGENTS.md、阶段 README、两张汇总表描述一致"
   else
     bad "阶段准出在文档间不一致（门控才是真正生效的那层）"
+    echo "$OUT" | sed 's/^/     /'
+  fi
+else
+  bad "未找到 python3，跳过"
+fi
+
+section "10. Shell 变量引用后不接全角字符（bash 3.2 陷阱）"
+if command -v python3 >/dev/null 2>&1; then
+  OUT=$(python3 - "$REPO_ROOT" <<'PY'
+import glob
+import os
+import re
+import sys
+
+root = sys.argv[1]
+pat = re.compile(r"\$([A-Za-z_][A-Za-z0-9_]*)([^\x00-\x7F])")
+files = (sorted(glob.glob(os.path.join(root, "scripts", "*.sh")))
+         + sorted(glob.glob(os.path.join(root, "tests", "*.sh")))
+         + sorted(glob.glob(os.path.join(root, "template", "**", "*.sh"), recursive=True)))
+found = []
+for f in files:
+    for i, line in enumerate(open(f, encoding="utf-8"), 1):
+        for m in pat.finditer(line):
+            found.append(f"{os.path.relpath(f, root)}:{i}: ${m.group(1)} 后紧跟 {m.group(2)}")
+if found:
+    for item in found:
+        print("  ❌ " + item)
+    print("  macOS 的 bash 3.2 会把高位字节并入变量名，导致变量未定义或静默丢失；请写成 ${VAR}")
+    sys.exit(1)
+sys.exit(0)
+PY
+)
+  if [[ $? -eq 0 ]]; then
+    ok "Shell 脚本中无「变量后紧接全角字符」写法"
+  else
+    bad "存在会触发 bash 3.2 误解析的变量写法"
     echo "$OUT" | sed 's/^/     /'
   fi
 else

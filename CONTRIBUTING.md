@@ -113,8 +113,12 @@
 - 脚本中变量名后**紧接全角字符**时，必须写成 `${VAR}`，不能用 `$VAR`。
   原因：macOS 自带的 bash 3.2 会把高位字节（≥ `0x80`）并入变量名，导致
   `$rel（用户数据…）` 被解析为变量 `rel<0xEF>` 并触发 `set -u` 报错。CI 的
-  macOS runner 正是 bash 3.2，因此这个错误必现。
+  macOS runner 正是 bash 3.2，因此这个错误必现。**该约定已由 `scripts/validate.sh` 第 10 节强制检查。**
 - 新增脚本需同时登记到 `scripts/validate.sh` 第 1 节（必需文件）与第 5 节（语法检查）。
+- **不要在 `$()` 内嵌的 heredoc 正文里写字面反引号。** 原因同上：bash 3.2 会把反引号误判为
+  未闭合的引号，报 `unexpected EOF while looking for matching`，且**报错行号指向 heredoc 内部**，
+  极难定位。需要剥离反引号时用 `chr(96)` 代替字面反引号。已实测：同一脚本在 Linux 的 bash 5 下
+  不报错，只在 macOS 的 bash 3.2 下必现——这类错误只能靠 CI 的 macOS job 拦下。
 
 ## 决策记录
 

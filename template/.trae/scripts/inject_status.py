@@ -3,6 +3,9 @@
 
 每次新建会话时自动执行，把 PROJECT_STATE.json 中的当前阶段、进度、
 下一步动作作为附加上下文提供给智能体，使其无需询问即可知道该做什么。
+
+「下一步动作」不存字段，而是取当前阶段第一个未完成的 checklist 项——
+避免与 checklist 构成双重真相而变陈旧。
 """
 import json
 import os
@@ -33,13 +36,20 @@ def main() -> int:
     idx = stage_order.index(current) if current in stage_order else -1
     stage_no = idx + 1 if idx >= 0 else "?"
 
+    checklist = stage_info.get("checklist", [])
+    pending = [item for item in checklist if not item.get("done")]
+
     print("[项目状态自动加载]")
     print(f"项目名称: {state.get('project_name', '未命名')}")
     print(f"当前阶段: {stage_info.get('name', current)}（{current}, 第 {stage_no}/{len(stage_order)} 阶段）")
     print(f"阶段状态: {stage_info.get('status', '未知')}")
-    print(f"下一步动作: {state.get('next_action', '未设置')}")
+    if pending:
+        print(f"下一步动作: {pending[0].get('item', '')}")
+    elif checklist:
+        print("下一步动作: 本阶段清单已全部完成，提示用户运行 /advance 推进")
+    else:
+        print("下一步动作: 当前阶段无清单项")
 
-    checklist = stage_info.get("checklist", [])
     if checklist:
         print("本阶段清单:")
         for item in checklist:

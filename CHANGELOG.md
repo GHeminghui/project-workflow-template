@@ -15,6 +15,24 @@
   - 运营：门控与两张汇总表补上 `monitoring.md`；`AGENTS.md` 准出改为 `deploy.md` + `runbook.md` + `release-notes.md` + `monitoring.md`
 - `template/README.md` 标题「三个命令」更正为「四个命令」（上一版加入 `/upgrade` 时漏改）
 - `VERSION` 推进至 `0.3.0`：载荷已改动，而升级工具在「版本相同」时会短路，不推进会导致改动静默升不上去。该约束已写入 `CONTRIBUTING.md` 与升级工具规格 §5
+- **状态文件只保留不可派生的字段**：删除 `next_action` 与各阶段 `deliverables`，改为现场派生
+  - Hook 注入的「下一步动作」现取当前阶段第一个未完成的 checklist 项，不再可能陈旧
+  - `/status` 的「下一步动作」与「已完成交付物」均现场派生
+  - 原因：二者与 checklist 构成双重真相；而 `deliverables` 从未被任何代码写入过（`/status` 展示它却永远是空）
+- 统一阶段显示名，以 `PROJECT_STATE.json` 的 `stages[].name` 为权威来源：开发（原为「执行(开发)」/「执行」/「开发」三种写法）、运营（原「上线运营」）
+- `/advance` 新增产物存在性核对：已勾选项的 `artifact` 不存在时列出并请用户确认，而非直接放行
+- `AGENTS.md` 新增约束：勾选某项前先确认其 `artifact` 已真实产出
+- 修正「交付给下一阶段」的产物归属：调研的需求清单明确落在 `research.md`；开发阶段不再承诺「部署说明」（该文件归运营阶段）
+- `scripts/validate.sh` 第 9 节扩展为同时校验阶段显示名（AGENTS.md 标题、阶段 README 标题、两张汇总表共 4 处比对 `stages[].name`）
+- `VERSION` 推进至 `0.4.0`：载荷再次改动，版本号仍须前进以避开升级工具的「版本相同」短路
+
+### Fixed
+- `scripts/validate.sh` 修复一处 **bash 3.2 专属**语法错误：`$()` 内嵌 heredoc 正文中的字面反引号被误解析（改用 `chr(96)`）。该写法在 Linux 的 bash 5 下不报错，只在 macOS 的 bash 3.2 下必现；相应约定已记入 `CONTRIBUTING.md`
+- 修复两处既有的「变量后紧接全角字符」写法——同属 bash 3.2 陷阱，且**都在报错/警告分支**，正常路径永远看不到，一旦触发就崩在诊断代码上：
+  - `scripts/gen-manifest.sh` 的未知选项提示（`$1（`）
+  - `scripts/setup-global.sh` 的缺失文件警告（`$s，`）——缺文件时文件名会被静默丢失
+- `scripts/validate.sh` 新增第 10 节：扫描全部 Shell 脚本，禁止「变量后紧接全角字符」写法
+- `tests/test_install.sh` 修正一条**过弱断言**：原用 `grep` 匹配产物文字，而该文字在「本阶段清单」中也会出现，导致派生逻辑坏掉也照样通过；现改为精确比对「下一步动作:」整行
 
 ## [0.2.0] - 2026-09-26
 

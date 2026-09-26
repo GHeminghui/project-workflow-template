@@ -62,10 +62,45 @@ else
   bad "安装的清单与载荷不一致"
 fi
 
-section "3. 状态注入脚本可运行"
+section "3. 状态注入脚本可运行（下一步动作由 checklist 派生）"
 OUT=$(TRAE_PROJECT_DIR="$TARGET" python3 "$TARGET/.trae/scripts/inject_status.py" 2>&1 || true)
 echo "$OUT" | grep -q "当前阶段" && ok "输出包含当前阶段" || bad "输出异常: $OUT"
 echo "$OUT" | grep -q "调研" && ok "当前阶段为调研" || bad "阶段渲染异常"
+FIRST_ITEM=$(python3 -c "
+import json
+d = json.load(open('$TARGET/PROJECT_STATE.json', encoding='utf-8'))
+print(d['stages'][d['current_stage']]['checklist'][0]['item'])")
+NEXT_LINE=$(echo "$OUT" | grep "^下一步动作:" | sed 's/^下一步动作: //')
+if [[ "$NEXT_LINE" == "$FIRST_ITEM" ]]; then
+  ok "下一步动作派生自第一个未完成项"
+else
+  bad "下一步动作未正确派生: 得到「${NEXT_LINE}」，期望「${FIRST_ITEM}」"
+fi
+python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
+import json, sys
+p = sys.argv[1]
+d = json.load(open(p, encoding="utf-8"))
+d["stages"]["discovery"]["checklist"][0]["done"] = True
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+PY
+SECOND_ITEM=$(python3 -c "
+import json
+d = json.load(open('$TARGET/PROJECT_STATE.json', encoding='utf-8'))
+print(d['stages']['discovery']['checklist'][1]['item'])")
+OUT2=$(TRAE_PROJECT_DIR="$TARGET" python3 "$TARGET/.trae/scripts/inject_status.py" 2>&1 || true)
+NEXT_LINE2=$(echo "$OUT2" | grep "^下一步动作:" | sed 's/^下一步动作: //')
+if [[ "$NEXT_LINE2" == "$SECOND_ITEM" ]]; then
+  ok "勾选后下一步动作自动前移（派生生效）"
+else
+  bad "下一步动作未随勾选前移: 得到「${NEXT_LINE2}」，期望「${SECOND_ITEM}」"
+fi
+python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
+import json, sys
+p = sys.argv[1]
+d = json.load(open(p, encoding="utf-8"))
+d["stages"]["discovery"]["checklist"][0]["done"] = False
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+PY
 
 section "4. 默认跳过已存在文件（不覆盖）"
 echo "CUSTOM" > "$TARGET/AGENTS.md"
@@ -73,7 +108,7 @@ bash "$REPO_ROOT/scripts/install.sh" "$TARGET" >/dev/null 2>&1
 grep -q "CUSTOM" "$TARGET/AGENTS.md" && ok "已存在文件未被覆盖" || bad "已存在文件被误覆盖"
 
 section "5. --force 覆盖模板文件，但不得破坏 PROJECT_STATE.json"
-# 先在状态文件里写入一份"用户进度"，再执行 -f，验证进度不被清空
+# 先在状态文件里写入一份"用户进度"，再执行 -f，验证状态文件逐字节不变
 python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
 import json, sys
 p = sys.argv[1]
@@ -81,33 +116,20 @@ with open(p, encoding="utf-8") as f:
     d = json.load(f)
 d["current_stage"] = "design"
 d["stages"]["discovery"]["status"] = "done"
+d["stages"]["discovery"]["completed_at"] = "2026-01-01"
 for it in d["stages"]["discovery"]["checklist"]:
     it["done"] = True
-d["stages"]["discovery"]["deliverables"] = ["00-discovery/research.md"]
 with open(p, "w", encoding="utf-8") as f:
     json.dump(d, f, ensure_ascii=False, indent=2)
 PY
+cp "$TARGET/PROJECT_STATE.json" "$WORK/state-with-progress.json"
 bash "$REPO_ROOT/scripts/install.sh" "$TARGET" -f >/dev/null 2>&1
 grep -q "CUSTOM" "$TARGET/AGENTS.md" && bad "--force 未生效" || ok "--force 成功覆盖模板文件 AGENTS.md"
-if command -v python3 >/dev/null 2>&1; then
-  if python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
-import json, sys
-d = json.load(open(sys.argv[1], encoding="utf-8"))
-dis = d["stages"]["discovery"]
-ok = (d.get("current_stage") == "design"
-      and dis.get("status") == "done"
-      and all(i["done"] for i in dis["checklist"])
-      and len(dis.get("deliverables", [])) == 1)
-if not ok:
-    print(f"current_stage={d.get('current_stage')} status={dis.get('status')} "
-          f"checklist={[i['done'] for i in dis['checklist']]} deliverables={dis.get('deliverables')}")
-sys.exit(0 if ok else 1)
-PY
-  then
-    ok "--force 未破坏 PROJECT_STATE.json（进度完整保留）"
-  else
-    bad "--force 破坏了 PROJECT_STATE.json"
-  fi
+if cmp -s "$WORK/state-with-progress.json" "$TARGET/PROJECT_STATE.json"; then
+  ok "--force 未改动 PROJECT_STATE.json（逐字节一致，进度完整保留）"
+else
+  bad "--force 改动了 PROJECT_STATE.json"
+  diff "$WORK/state-with-progress.json" "$TARGET/PROJECT_STATE.json" | head -n 10
 fi
 
 section "6. 全局安装（模拟 HOME）"

@@ -1,4 +1,4 @@
-# 阶段 3：执行 / 开发（Development）
+# 阶段 3：开发（Development）
 
 ## 目标
 把设计变成可运行、可测试的代码。
@@ -21,7 +21,7 @@
 - [ ] `changelog.md`：开发日志
 
 ## 交付给下一阶段
-通过测试的可部署产物 + 部署说明。
+通过测试的可部署产物；部署说明由下一阶段产出为 `03-operations/deploy.md`。
 
 ## 完成标准
 全量测试通过后，`PROJECT_STATE.json` 中 `development` 阶段的 checklist 全部勾选，再运行 `/advance`。

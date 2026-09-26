@@ -15,7 +15,6 @@
       "status": "in_progress",
       "started_at": "2026-09-26",
       "completed_at": null,
-      "deliverables": [],
       "checklist": [
         {
           "item": "完成背景、目标用户与竞品调研，输出研究结论",
@@ -35,7 +34,6 @@
       "status": "pending",
       "started_at": null,
       "completed_at": null,
-      "deliverables": [],
       "checklist": [
         {
           "item": "输出产品规格 product-spec.md",
@@ -55,12 +53,11 @@
       ]
     },
     "development": {
-      "name": "执行(开发)",
+      "name": "开发",
       "dir": "02-development",
       "status": "pending",
       "started_at": null,
       "completed_at": null,
-      "deliverables": [],
       "checklist": [
         {
           "item": "完成任务拆分 plan.md",
@@ -85,12 +82,11 @@
       ]
     },
     "operations": {
-      "name": "上线运营",
+      "name": "运营",
       "dir": "03-operations",
       "status": "pending",
       "started_at": null,
       "completed_at": null,
-      "deliverables": [],
       "checklist": [
         {
           "item": "输出部署方案 deploy.md",
@@ -115,7 +111,6 @@
       ]
     }
   },
-  "next_action": "开始调研：明确项目背景、目标用户和竞品",
   "last_updated": "2026-09-26",
-  "template_version": "0.3.0"
+  "template_version": "0.4.0"
 }

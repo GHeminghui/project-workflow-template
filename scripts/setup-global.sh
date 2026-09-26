@@ -64,7 +64,7 @@ for s in install.sh upgrade.sh; do
     cp "$REPO_ROOT/scripts/$s" "$TEMPLATE_DEST/$s"
     echo "    复制 $s"
   else
-    echo "    [警告] 未找到 scripts/$s，跳过"
+    echo "    [警告] 未找到 scripts/${s}，跳过"
   fi
 done
 

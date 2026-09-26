@@ -14,11 +14,11 @@
 - `industry-researcher` / `industry-panorama-research`：行业与赛道研究
 
 ## 准出产物
-- [ ] `research.md`：背景、目标用户、竞品、技术可行性
+- [ ] `research.md`：背景、目标用户、竞品、技术可行性，以及需求清单与约束条件
 - [ ] `decision.md`：Go / No-Go 决策记录
 
 ## 交付给下一阶段
-明确的需求清单 + 约束条件。
+明确的需求清单与约束条件（见 `research.md` 的研究结论）。
 
 ## 完成标准
 `PROJECT_STATE.json` 中 `discovery` 阶段的 checklist 全部勾选后，运行 `/advance`。

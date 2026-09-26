@@ -83,7 +83,7 @@ AI 读取 PROJECT_STATE.json
               · 当前阶段 status=done, completed_at
               · 下一阶段 status=in_progress, started_at
               · 切换 current_stage
-              · 刷新 next_action / last_updated
+              · 刷新 last_updated
                   │
                   ▼
               写入 PROJECT_STATE.json + git commit
