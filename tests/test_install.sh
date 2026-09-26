@@ -305,6 +305,20 @@ bash "$UP_PAYLOAD/upgrade.sh" "$OLD_PROJ" --apply --force >/dev/null 2>&1
 [[ -f "$OLD_PROJ/.trae/template-manifest.json" ]] && ok "首次 --force 升级后已建立基线" || bad "基线未建立"
 bash "$UP_PAYLOAD/upgrade.sh" "$OLD_PROJ" >/dev/null 2>&1 && ok "建立基线后恢复精确判定（已是最新）" || bad "基线建立后仍无法判定"
 
+section "15. 升级工具：目标目录不像模板项目时拒绝（F2）"
+NOT_PROJ="$WORK/not-a-project"
+mkdir -p "$NOT_PROJ"
+UP_OUT="$(bash "$UP_PAYLOAD/upgrade.sh" "$NOT_PROJ" 2>&1)"; UP_RC=$?
+[[ "$UP_RC" -eq 2 ]] && ok "非项目目录退出码为 2" || bad "退出码异常: $UP_RC"
+echo "$UP_OUT" | grep -q "不像模板项目" && ok "报告说明该目录不像模板项目" || bad "未给出拒绝原因"
+[[ -z "$(ls -A "$NOT_PROJ")" ]] && ok "被拒绝时未向该目录写入任何文件" || bad "被拒绝却写入了文件"
+bash "$UP_PAYLOAD/upgrade.sh" "$NOT_PROJ" --apply >/dev/null 2>&1; UP_RC=$?
+[[ "$UP_RC" -eq 2 && -z "$(ls -A "$NOT_PROJ")" ]] && ok "--apply 同样被拒绝且未落盘" || bad "--apply 未被拒绝: rc=$UP_RC"
+bash "$UP_PAYLOAD/upgrade.sh" "$NOT_PROJ" --force >/dev/null 2>&1; UP_RC=$?
+[[ "$UP_RC" -eq 1 ]] && ok "显式加 --force 可放行（不再报错 2）" || bad "--force 未放行: rc=$UP_RC"
+UP_OUT="$(bash "$UP_PAYLOAD/upgrade.sh" "$UP_PROJ" 2>&1)"
+echo "$UP_OUT" | grep -q "不像模板项目" && bad "正常项目被误判为非项目" || ok "正常项目不受影响（门禁无误伤）"
+
 echo
 echo "========================================"
 echo "  测试结果: 通过 $PASS 项，失败 $FAIL 项"
