@@ -25,6 +25,10 @@
 │   ├── design.md       设计原理
 │   ├── architecture.md 架构与数据流
 │   └── adr/            模板自身的决策记录
+├── .github/            仓库级配置
+│   ├── workflows/      ci.yml 校验与测试、release.yml 打包发布
+│   ├── release.yml     Release notes 分类配置
+│   └── PULL_REQUEST_TEMPLATE.md   PR 模板
 ├── template/           【载荷】被安装到用户项目的内容
 ├── scripts/
 │   ├── install.sh      安装到单个项目

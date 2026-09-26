@@ -13,6 +13,7 @@
 - `CONTRIBUTING.md` 新增「PR 与标签」标签约定，流程补充 PR 步骤，并说明两个 `release.yml` 的区别
 - `docs/architecture.md`、`AGENTS.md`、`README.md` 同步登记新增文件与脚本
 - CI 与发布工作流升级 action 版本以适配 Node 24：`actions/checkout` v4→v5、`actions/setup-python` v5→v6
+- `README.md` 仓库结构树补充 `.github/` 目录
 
 ## [0.1.2] - 2026-09-26
 
