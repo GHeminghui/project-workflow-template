@@ -18,6 +18,6 @@
 | 阶段 | 目录 | 关键产物 |
 |------|------|----------|
 | 调研 | `00-discovery/` | research.md、decision.md |
-| 设计 | `01-design/` | product-spec.md、tech-design.md |
+| 设计 | `01-design/` | product-spec.md、tech-design.md、architecture.html |
 | 开发 | `02-development/` | plan.md、src/、tests/、changelog.md |
-| 运营 | `03-operations/` | deploy.md、runbook.md、release-notes.md |
+| 运营 | `03-operations/` | deploy.md、runbook.md、release-notes.md、monitoring.md |

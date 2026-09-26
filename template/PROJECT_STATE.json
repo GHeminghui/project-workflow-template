@@ -18,12 +18,7 @@
       "deliverables": [],
       "checklist": [
         {
-          "item": "完成背景、目标用户与竞品调研",
-          "done": false,
-          "artifact": "00-discovery/research.md"
-        },
-        {
-          "item": "输出调研报告 research.md",
+          "item": "完成背景、目标用户与竞品调研，输出研究结论",
           "done": false,
           "artifact": "00-discovery/research.md"
         },
@@ -73,9 +68,14 @@
           "artifact": "02-development/plan.md"
         },
         {
-          "item": "代码实现并通过全部测试",
+          "item": "完成代码实现",
           "done": false,
           "artifact": "02-development/src"
+        },
+        {
+          "item": "全量测试通过",
+          "done": false,
+          "artifact": "02-development/tests"
         },
         {
           "item": "更新开发日志 changelog.md",
@@ -103,14 +103,19 @@
           "artifact": "03-operations/runbook.md"
         },
         {
-          "item": "完成上线验证与发布说明",
+          "item": "完成上线验证，输出发布说明 release-notes.md",
           "done": false,
           "artifact": "03-operations/release-notes.md"
+        },
+        {
+          "item": "输出监控方案 monitoring.md",
+          "done": false,
+          "artifact": "03-operations/monitoring.md"
         }
       ]
     }
   },
   "next_action": "开始调研：明确项目背景、目标用户和竞品",
   "last_updated": "2026-09-26",
-  "template_version": "0.2.0"
+  "template_version": "0.3.0"
 }

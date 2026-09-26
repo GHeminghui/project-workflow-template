@@ -61,10 +61,17 @@
 ## 发布
 
 `VERSION` 是模板版本的**单一数据源**，`template/.trae/template-manifest.json` 与
-`template/PROJECT_STATE.json` 里的版本号都由它派生。因此发布前必须先对齐版本：
+`template/PROJECT_STATE.json` 里的版本号都由它派生。
 
-1. 把 `CHANGELOG.md` 的 `[Unreleased]` 归入新版本段，如 `## [0.2.0] - YYYY-MM-DD`
-2. 把根目录 `VERSION` 改为同一版本号，如 `0.2.0`
+> **硬约束：载荷（`template/`）一有改动，就必须把 `VERSION` 推进到一个尚未发布过的版本号。**
+> 因为升级工具在「项目版本 == 模板版本」时会直接短路报「已是最新」（见
+> [docs/specs/upgrade-tool.md §5](docs/specs/upgrade-tool.md)）。若载荷变了而版本号没变，
+> 使用者执行 `/upgrade` 会被短路，**改动静默地升不上去**。
+
+发布前先对齐版本：
+
+1. 把 `CHANGELOG.md` 的 `[Unreleased]` 归入新版本段，如 `## [0.3.0] - YYYY-MM-DD`
+2. 确认根目录 `VERSION` 与要发布的版本号一致（如 `0.3.0`）
 3. 重新生成模板清单（会一并同步 `template/PROJECT_STATE.json` 的版本号）：
 
    ```bash
