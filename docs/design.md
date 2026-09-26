@@ -98,6 +98,11 @@
 
 这样既保留了线性（不给阶段链加回路），又让「已终止」与「已完成」成为可表达、可被 Hook 识别的状态——Hook 在非 `active` 时只提示状态、不再推动阶段。
 
+同样地，调研阶段的 Go/No-Go 结论存为 `stages.discovery.decision`（`pending` / `go` / `no-go`），
+`/advance` 依该字段分支，而不是解读 `00-discovery/decision.md` 的措辞。理由是：Go/No-Go 是整条流程唯一的分水岭，
+若把它留在文档里，判定就要依赖 AI 的语义理解，成为「状态单一数据源」之外唯一的软肋。`decision.md` 仍是结论的**依据**，
+只是不再是判定的依据。决策见 [ADR-003](adr/003-discovery-decision-field.md)。
+
 ## 非目标
 
 - **不做**复杂的权限/审批系统（保持轻量）

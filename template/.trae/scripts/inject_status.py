@@ -7,6 +7,9 @@
 「下一步动作」不存字段，而是取当前阶段第一个未完成的 checklist 项——
 避免与 checklist 构成双重真相而变陈旧。
 
+调研阶段的 Go/No-Go 结论取自 stages.discovery.decision 字段（不解读 decision.md 的措辞），
+字段存在时展示；老项目缺该字段则跳过。
+
 项目处于 rejected / archived 时只提示状态并停止推动阶段。
 """
 import json
@@ -17,6 +20,12 @@ STATUS_LABELS = {
     "active": "进行中",
     "rejected": "已否决（No-Go）",
     "archived": "已归档",
+}
+
+DECISION_LABELS = {
+    "pending": "未判定",
+    "go": "Go",
+    "no-go": "No-Go",
 }
 
 
@@ -50,6 +59,11 @@ def main() -> int:
     print(f"项目状态: {STATUS_LABELS.get(project_status, project_status)}")
     print(f"当前阶段: {stage_info.get('name', current)}（{current}, 第 {stage_no}/{len(stage_order)} 阶段）")
     print(f"阶段状态: {stage_info.get('status', '未知')}")
+
+    if current == "discovery":
+        decision = stage_info.get("decision", "")
+        if decision:
+            print(f"Go/No-Go 判定: {DECISION_LABELS.get(decision, decision)}")
 
     if project_status != "active":
         print("---")

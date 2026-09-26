@@ -12,6 +12,7 @@ description: 查看项目当前阶段、进度与下一步动作
 补充说明：
 
 - 第 3、4 条均由 `checklist` **派生**，状态文件里没有 `next_action` 与 `deliverables` 字段，不要去找它们。
+- 若当前阶段是 `discovery`，额外展示 `discovery.decision`（`pending` 未判定 / `go` / `no-go`）——它是「项目是否继续」的判定依据，与 `project_status` 相互印证。
 - 列出 checklist 时，若某项已勾选但其 `artifact` 路径不存在，请标注出来（如 `[x] ⚠ 产物缺失`）。
 - **若 `project_status` 不是 `active`**：明确提示用户流程已终止（已否决或已归档），不要给出推进建议。
 - 若 `PROJECT_STATE.json` 不存在，提示用户先运行 `/init-project`。

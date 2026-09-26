@@ -12,9 +12,10 @@ description: 将项目推进到下一阶段（要求当前阶段 checklist 全�
 4. 逐项核对已勾选内容的产物是否真实存在（`artifact` 可指向文件或目录，两者皆可）
    - 若有缺失：列出「已勾选但产物不存在」的项，**请用户确认**——是补齐产物，还是确认该项可视为完成
    - 用户确认后继续；用户选择补齐则停止推进，等产物就位后重新运行 `/advance`
-5. **若当前阶段是 `discovery`**：先确认 Go/No-Go 结论（读 `00-discovery/decision.md`；若无法判断则直接询问用户）
-   - **No-Go**：把 `discovery.status` 设为 `done` 并填写 `completed_at`，把 `project_status` 设为 `rejected`，刷新 `last_updated`，保存后**停止推进**，并告知用户项目已按 No-Go 终止
-   - **Go**：继续第 6 步
+5. **若当前阶段是 `discovery`**：依 `PROJECT_STATE.json` 中 `discovery.decision` 字段判定——**不要靠解读 `decision.md` 的措辞**
+   - **`go`**：继续第 6 步
+   - **`no-go`**：把 `discovery.status` 设为 `done` 并填写 `completed_at`，把 `project_status` 设为 `rejected`，刷新 `last_updated`，保存后**停止推进**，并告知用户项目已按 No-Go 终止
+   - **`pending`，或字段缺失（老项目）**：**不要替用户判定**。读 `00-discovery/decision.md`，把结论复述给用户并请其确认；拿到明确结论后**先把 `decision` 写入状态文件**（`go` 或 `no-go`），再按上面两条分支处理
 6. 更新状态：
    - 当前阶段：`status` 设为 `done`，填写 `completed_at` 为当前日期
    - 下一阶段：`status` 设为 `in_progress`，填写 `started_at` 为当前日期

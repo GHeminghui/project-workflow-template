@@ -57,6 +57,7 @@ PROJECT_STATE.json 项目状态（单一数据源）
 - `PROJECT_STATE.json` 是**唯一状态数据源**，任何阶段推进、checklist 勾选都必须更新它。
 - 每次更新后同步刷新 `last_updated` 字段；「下一步动作」由当前阶段第一个未完成的 checklist 项派生，无需手写。
 - `project_status` 表示项目生命周期：`active`（进行中）、`rejected`（调研阶段 No-Go，流程终止）、`archived`（四阶段完成并归档）。**非 `active` 时不得继续推进阶段。**
+- `stages.discovery.decision` 记录调研阶段的 Go/No-Go 结论：`pending`（未判定）/ `go` / `no-go`。**`/advance` 依该字段判定，不靠解读 `decision.md` 的措辞**；`no-go` 与 `project_status: rejected` 同时成立。
 
 ## 关于迭代
 
