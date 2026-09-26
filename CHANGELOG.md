@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-09-26
+
 ### Added
 - **`PROJECT_STATE.json` 新增 `stages.discovery.decision` 字段**（`pending` / `go` / `no-go`）：把 Go/No-Go 结论从「AI 解读 `decision.md` 措辞」改为**确定性字段判定**——此前它是整套「状态单一数据源」之外唯一的软肋（dogfooding 发现项 F4，决策见 `docs/adr/003-discovery-decision-field.md`）
 - `scripts/validate.sh` 第 3 节新增校验：`discovery.decision` 必须存在且取值合法，且 `project_status: rejected` 必然对应 `decision: no-go`
