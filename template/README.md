@@ -26,7 +26,7 @@
 | 开发 | `02-development/` | `plan.md`、`src/`、`tests/`、`changelog.md` |
 | 运营 | `03-operations/` | `deploy.md`、`runbook.md`、`release-notes.md`、`monitoring.md` |
 
-各阶段的准入条件、推荐工具与准出产物，见对应目录下的 `README.md`。
+各阶段的准入条件、推荐能力与准出产物，见对应目录下的 `README.md`。
 
 ## 决策留痕
 

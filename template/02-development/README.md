@@ -8,14 +8,18 @@
 - 已有验收标准
 
 ## 推荐能力
+
+### 技能
 - `writing-plans`：把设计拆成多步执行计划
-- `test-driven-development` / `Praxis:tdd`：先写测试再实现
-- `browser_use`：前端页面验证
+- `test-driven-development` / `Praxis:tdd`：先写测试再实现（二者择一）
+- `agent-browser`：前端页面验证
+
+### 工具
 - `RunCommand`：构建、测试、lint
 - `TodoWrite`：子任务进度跟踪
 
 ## 准出产物
-- [ ] `plan.md`：任务拆分与进度
+- [ ] `plan.md`：任务拆分（进度以 `PROJECT_STATE.json` 为准，不在此重复维护）
 - [ ] `src/`：代码
 - [ ] `tests/`：测试（需全部通过）
 - [ ] `changelog.md`：开发日志

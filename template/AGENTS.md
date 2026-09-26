@@ -7,7 +7,7 @@
 
 1. **开始任何工作前**，先读取项目根目录的 `PROJECT_STATE.json`，确认当前阶段与下一步动作。
 2. **每次回复开头**，用一句话说明：「当前处于 X 阶段，本次目标是 Y」。
-3. **严格按阶段顺序执行**，阶段准入准出以 `PROJECT_STATE.json` 中对应阶段的 `checklist` 为准。
+3. **严格按阶段顺序执行**：阶段**准出**以 `PROJECT_STATE.json` 中对应阶段的 `checklist` 为准；阶段**准入**条件见各阶段目录的 `README.md`（属模板的静态约定，不随项目状态变化）。
 4. **不得越阶段操作**：例如设计阶段不得写生产代码，开发阶段不得擅自部署上线。
 5. **完成当前阶段全部 checklist 后**，提示用户运行 `/advance` 推进到下一阶段，不要自行推进。
 6. **关键决策**记录到 `docs/adr/`，使用轻量 ADR 格式（背景 / 决策 / 后果）。
@@ -17,22 +17,26 @@
 
 ### 调研 (discovery) — 目录 `00-discovery/`
 - 目标：搞清楚「做什么、为什么做、现状如何」
-- 推荐能力：WebSearch、WebFetch、whiteboard、report-page、industry-researcher
+- 推荐技能：`whiteboard`、`report-page`、`industry-researcher`、`industry-panorama-research`
+- 推荐工具：`WebSearch`、`WebFetch`
 - 准出：`research.md` + `decision.md` 完成
 
 ### 设计 (design) — 目录 `01-design/`
 - 目标：把需求转化为可执行方案（产品设计 + 技术设计）
-- 推荐能力：brainstorming、Praxis:design、whiteboard、visualize-code、Frontend Design
+- 推荐技能：`brainstorming`、`Praxis:design`、`whiteboard`、`visualize-code`、`Frontend Design`、`web-app-development`
+- 推荐工具：（无，以技能为主）
 - 准出：`product-spec.md` + `tech-design.md` + `architecture.html`
 
 ### 开发 (development) — 目录 `02-development/`
 - 目标：把设计变成可运行、可测试的代码
-- 推荐能力：writing-plans、test-driven-development、Praxis:tdd、browser_use、RunCommand
+- 推荐技能：`writing-plans`、`test-driven-development` / `Praxis:tdd`、`agent-browser`
+- 推荐工具：`RunCommand`、`TodoWrite`
 - 准出：`plan.md` + `src/` + `tests/`（全量通过）+ `changelog.md`
 
 ### 运营 (operations) — 目录 `03-operations/`
 - 目标：部署上线并持续监控运行
-- 推荐能力：Praxis:ship、Praxis:release、verification-before-completion
+- 推荐技能：`Praxis:ship`、`Praxis:release`、`verification-before-completion`、`lark`、`wecom`
+- 推荐工具：`RunCommand`
 - 准出：`deploy.md` + `runbook.md` + `release-notes.md` + `monitoring.md`
 
 ## 目录结构

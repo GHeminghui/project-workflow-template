@@ -8,10 +8,14 @@
 - 已通过全量测试
 
 ## 推荐能力
+
+### 技能
 - `Praxis:ship` / `Praxis:release`：发布与版本打 tag
 - `verification-before-completion`：上线前验证清单
-- `RunCommand`：部署脚本、监控命令
 - `lark` / `wecom`：上线通知与团队同步（如需要）
+
+### 工具
+- `RunCommand`：部署脚本、监控命令
 
 ## 准出产物
 - [ ] `deploy.md`：部署步骤、回滚方案
