@@ -8,10 +8,14 @@
 - `PROJECT_STATE.json` 中本阶段状态为 `in_progress`
 
 ## 推荐能力
-- `WebSearch` / `WebFetch`：资料收集、竞品分析
+
+### 技能
 - `whiteboard`：思维导图、用户旅程图、竞品对比图
 - `report-page`：结构化调研报告
 - `industry-researcher` / `industry-panorama-research`：行业与赛道研究
+
+### 工具
+- `WebSearch` / `WebFetch`：资料收集、竞品分析
 
 ## 准出产物
 - [ ] `research.md`：背景、目标用户、竞品、技术可行性，以及需求清单与约束条件

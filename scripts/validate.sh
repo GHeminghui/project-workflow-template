@@ -344,6 +344,131 @@ else
   bad "未找到 python3，跳过"
 fi
 
+section "11. 推荐能力一致性（AGENTS.md ↔ 阶段 README）"
+if command -v python3 >/dev/null 2>&1; then
+  OUT=$(python3 - "$TEMPLATE" <<'PY'
+import os
+import re
+import sys
+
+template = sys.argv[1]
+STAGES = [("discovery", "00-discovery"), ("design", "01-design"),
+          ("development", "02-development"), ("operations", "03-operations")]
+
+BT = chr(96)
+BT_RE = re.compile(BT + r"([^" + BT + r"]+)" + BT)
+
+
+def backticks(text):
+    return [t.strip() for t in BT_RE.findall(text) if t.strip()]
+
+
+def subsection(body, heading):
+    m = re.search(r"^### " + heading + r"\s*\n(.*?)(?=^##|\Z)", body, re.S | re.M)
+    return set(backticks(m.group(1))) if m else set()
+
+
+readme_caps = {}
+for key, d in STAGES:
+    with open(os.path.join(template, d, "README.md"), encoding="utf-8") as f:
+        text = f.read()
+    sec = re.search(r"^## 推荐能力\s*\n(.*?)(?=^## |\Z)", text, re.S | re.M)
+    body = sec.group(1) if sec else ""
+    readme_caps[key] = (subsection(body, "技能"), subsection(body, "工具"))
+
+with open(os.path.join(template, "AGENTS.md"), encoding="utf-8") as f:
+    agents_text = f.read()
+agents_caps = {}
+for key, d in STAGES:
+    sec = re.search(r"^###[^\n]*" + re.escape(d) + r"[^\n]*\n(.*?)(?=\n###|\n##|\Z)",
+                    agents_text, re.S | re.M)
+    block = sec.group(1) if sec else ""
+    skills = set()
+    tools = set()
+    m = re.search(r"^- 推荐技能：(.*)$", block, re.M)
+    if m:
+        skills = set(backticks(m.group(1)))
+    m = re.search(r"^- 推荐工具：(.*)$", block, re.M)
+    if m:
+        tools = set(backticks(m.group(1)))
+    agents_caps[key] = (skills, tools)
+
+errors = []
+for key, d in STAGES:
+    for idx, label in ((0, "技能"), (1, "工具")):
+        a = agents_caps[key][idx]
+        r = readme_caps[key][idx]
+        if a != r:
+            detail = []
+            if r - a:
+                detail.append("AGENTS.md 缺 " + "、".join(sorted(r - a)))
+            if a - r:
+                detail.append(d + "/README.md 缺 " + "、".join(sorted(a - r)))
+            errors.append(d + "/ 的推荐" + label + "不一致：" + "；".join(detail))
+
+if errors:
+    for e in errors:
+        print("  ❌ " + e)
+    print("  推荐能力以阶段 README 为准；请让 AGENTS.md 与它一致")
+    sys.exit(1)
+sys.exit(0)
+PY
+)
+  if [[ $? -eq 0 ]]; then
+    ok "AGENTS.md 与阶段 README 的推荐能力一致"
+  else
+    bad "推荐能力在 AGENTS.md 与阶段 README 间不一致"
+    echo "$OUT" | sed 's/^/     /'
+  fi
+else
+  bad "未找到 python3，跳过"
+fi
+
+section "12. 阶段 README 三节齐备（准入条件 / 推荐能力 / 准出产物）"
+if command -v python3 >/dev/null 2>&1; then
+  OUT=$(python3 - "$TEMPLATE" <<'PY'
+import os
+import re
+import sys
+
+template = sys.argv[1]
+STAGES = [("discovery", "00-discovery"), ("design", "01-design"),
+          ("development", "02-development"), ("operations", "03-operations")]
+SECTIONS = ["准入条件", "推荐能力", "准出产物"]
+
+errors = []
+for key, d in STAGES:
+    with open(os.path.join(template, d, "README.md"), encoding="utf-8") as f:
+        text = f.read()
+    for name in SECTIONS:
+        m = re.search(r"^## " + name + r"\s*$", text, re.M)
+        if not m:
+            errors.append(d + "/README.md 缺少「## " + name + "」小节")
+            continue
+        after = text[m.end():]
+        nxt = re.search(r"^## ", after, re.M)
+        body = after[:nxt.start()] if nxt else after
+        if not re.search(r"^\s*-\s", body, re.M):
+            errors.append(d + "/README.md 的「## " + name + "」小节为空")
+
+if errors:
+    for e in errors:
+        print("  ❌ " + e)
+    print("  阶段 README 必须齐备这三节；新增阶段时同样要求")
+    sys.exit(1)
+sys.exit(0)
+PY
+)
+  if [[ $? -eq 0 ]]; then
+    ok "四个阶段 README 均齐备准入条件、推荐能力、准出产物"
+  else
+    bad "阶段 README 结构不齐备（准入/推荐/准出）"
+    echo "$OUT" | sed 's/^/     /'
+  fi
+else
+  bad "未找到 python3，跳过"
+fi
+
 echo
 echo "========================================"
 echo "  校验结果: 通过 $PASS 项，失败 $FAIL 项"

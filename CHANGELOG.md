@@ -4,8 +4,21 @@
 
 ## [Unreleased]
 
+### Added
+- `scripts/validate.sh` 新增第 11 节「推荐能力一致性」：校验 `AGENTS.md` 的「推荐技能 / 推荐工具」与四个阶段 README 的「## 推荐能力」完全一致
+- `scripts/validate.sh` 新增第 12 节「阶段 README 结构齐备」：每个阶段 README 必须含非空的「准入条件 / 推荐能力 / 准出产物」三节
+- `CONTRIBUTING.md` 新增「扩展阶段数」章节：列出增减、重命名或调序阶段时必须同步的全部位置（并说明 `inject_status.py` 无需改动）
+
 ### Changed
 - `CONTRIBUTING.md` 新增「分支保护」章节，固化 `main` 的 Rulesets 保护策略：要求 PR（`Required approvals` 填 0）+ CI 通过（两条矩阵检查名已列明）+ 禁强推/禁删除，Admin bypass 设为 **Always**；并写明「发布提交直推 `main`」是唯一例外；「发布」第 5 步同步写明该直推流程
+- **推荐能力清单统一为「技能 / 工具」两类**，并让 `AGENTS.md` 与四个阶段 README 一致——此前两处互有出入（`AGENTS.md` 少了 `industry-panorama-research`、`web-app-development`、`TodoWrite`、`RunCommand`、`lark`/`wecom`），且工具与技能混列
+- `plan.md` 的职责收敛为「任务拆分」，去掉「进度」：进度统一以 `PROJECT_STATE.json` 为准，不再出现第二个进度的落脚点
+- `AGENTS.md` 规则 3 由「阶段准入准出以 `checklist` 为准」更正为「**准出**以 `checklist` 为准、**准入**见各阶段 README」——原表述与实际门控不符（checklist 只编码准出）
+- `docs/design.md` 的「阶段门控的设计」补充「准入为静态约定、不做机器校验」的说明；`docs/architecture.md` 更新 `validate.sh` 职责并新增「扩展阶段数」小节
+- `VERSION` 推进至 `0.6.0`（本段改动触及载荷，按约定推进版本号）
+
+### Fixed
+- 修正 `template/AGENTS.md` 与 `02-development/README.md` 中不存在的技能名 `browser_use` → `agent-browser`
 
 ## [0.5.0] - 2026-09-26
 

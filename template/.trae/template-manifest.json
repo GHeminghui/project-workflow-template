@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "template_name": "project-workflow-template",
-  "template_version": "0.5.0",
+  "template_version": "0.6.0",
   "files": [
     {
       "path": ".gitignore",
@@ -33,32 +33,32 @@
     },
     {
       "path": "00-discovery/README.md",
-      "sha256": "a1fe7d1475e246b6e4a183217f145598424078ba20248deb76f5faf235bcdd1b"
+      "sha256": "d9146bddcc3a544441d221844ba5fda8612141debc956f0af07682ede55093a4"
     },
     {
       "path": "01-design/README.md",
-      "sha256": "aebf5c639ff4c3c964ddedc63871c2d14d940f7d0dd4bf9fbed0d7a88555d0be"
+      "sha256": "65b9975f72e7b629a03188c775b7d387f0e30b12cee3735afeb6b0eb86234975"
     },
     {
       "path": "02-development/README.md",
-      "sha256": "75752bcf4de8c37dc3fa6c50a90f57121aed0ea0b41e4f4e2500ed0a683a163e"
+      "sha256": "32e8ad4198dd1ba414fb96d59ba1849794f09c0239896e7accc3ceed0df9c172"
     },
     {
       "path": "03-operations/README.md",
-      "sha256": "5d44bcdaf3ea0baed8a7fe7225f4c3e59592bdd520cb5fd663ec7f05272ddd5d"
+      "sha256": "c7ed702cd2283fa9f4aed55f2bcbd9b50a26ef8d5a5afeaf4a564ccb32937062"
     },
     {
       "path": "AGENTS.md",
-      "sha256": "bcb129eea52b18397ace6086ab25963fa21c84523f3f9145233dea585de9cd30"
+      "sha256": "161c85ed6af1f7b8f6c3e6faa250019aef2b7577fe52897ab27066b0f7962029"
     },
     {
       "path": "PROJECT_STATE.json",
-      "sha256": "c36c4256f6bb51b818c77f2f645f21dca1a1fad9a7eff20741390883fc81e623",
+      "sha256": "4a56a8f9a46e8aee75d8bc2a6b40bad5774311a7336c92642f7c1c08c2e3835f",
       "mode": "create-only"
     },
     {
       "path": "README.md",
-      "sha256": "a18fc8475f2276c5113a0e4bbf45164c0ac25bb499af428f86155e8fd9168182"
+      "sha256": "932a8e0982798ae3a5ace72b30dafc44017f381c91235ed058465d21476cd0ac"
     },
     {
       "path": "docs/README.md",

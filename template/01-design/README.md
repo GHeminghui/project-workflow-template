@@ -8,6 +8,8 @@
 - 已明确需求清单与约束条件
 
 ## 推荐能力
+
+### 技能
 - `brainstorming`：澄清需求与设计方向
 - `Praxis:design`：标准/复杂需求的设计流程
 - `whiteboard`：架构图、流程图、ER 图、时序图

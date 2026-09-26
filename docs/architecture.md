@@ -178,7 +178,7 @@ Release 页面：按 PR 标签归类的 notes + 三个分发产物
 | `scripts/install.sh` | 载荷分发 | `template/` 文件清单 |
 | `scripts/setup-global.sh` | 全局安装 | `commands/init-project.md`、`commands/upgrade.md` 的引用路径 |
 | `scripts/upgrade.sh` | 升级项目内模板文件 | `docs/specs/upgrade-tool.md`、`VERSION`、模板清单 |
-| `scripts/validate.sh` | 完整性校验（含清单一致性、阶段准出一致性） | `template/` 结构、状态字段、模板清单、阶段准出 |
+| `scripts/validate.sh` | 完整性校验（清单一致性、阶段准出 / 推荐能力 / README 结构一致性） | `template/` 结构、状态字段、模板清单、阶段准出与推荐能力 |
 | `scripts/gen-manifest.sh` | 生成/校验模板清单 | `VERSION`、`template/.trae/template-manifest.json`、`validate.sh` |
 | `VERSION` | 模板版本单一数据源 | `scripts/gen-manifest.sh`、`CONTRIBUTING.md` 发版流程 |
 | `scripts/setup-labels.sh` | 同步 PR 标签（供 release notes 归类） | `.github/release.yml`、`CONTRIBUTING.md` 标签约定 |
@@ -202,3 +202,12 @@ Release 页面：按 PR 标签归类的 notes + 三个分发产物
 判断方式（见脚本实现）：
 - 若 `脚本目录/../template` 存在 → 载荷为 `../template`
 - 否则若 `脚本目录/PROJECT_STATE.json` 存在 → 载荷为脚本目录自身
+
+## 5. 扩展阶段数
+
+阶段集合被 `validate.sh` 硬校验（第 3 节的 `stage_order` 断言，以及第 9 / 11 / 12 节的 `STAGES` 列表）。
+若要增减、重命名或调序阶段，**需要同步改动的完整清单见 [CONTRIBUTING.md 的「扩展阶段数」](../CONTRIBUTING.md#扩展阶段数)**。
+
+这里只强调一点：**阶段数不是运行时配置**。`inject_status.py` 已按 `stage_order` 与 `len(stage_order)` 通用计算，
+无需改动；但校验脚本、命令文档（`advance` / `init-project` / `status`）、`AGENTS.md` 与两张汇总表都得随之更新，
+否则 CI 会在校验阶段直接失败。

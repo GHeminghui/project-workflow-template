@@ -154,6 +154,33 @@ bypass 直推 `main`，**不走 PR**。原因是这条提交本身就是为生�
   极难定位。需要剥离反引号时用 `chr(96)` 代替字面反引号。已实测：同一脚本在 Linux 的 bash 5 下
   不报错，只在 macOS 的 bash 3.2 下必现——这类错误只能靠 CI 的 macOS job 拦下。
 
+## 扩展阶段数
+
+模板固定四阶段（调研 → 设计 → 开发 → 运营），且 `validate.sh` 对阶段序、准出、推荐能力、阶段 README 结构都有硬校验。
+**增减、重命名或调序阶段时，下列位置必须同步改动**，否则校验会失败：
+
+| 改动位置 | 需要同步的内容 |
+|---------|---------------|
+| `template/PROJECT_STATE.json` | `stage_order` 与 `stages`（含 `name` / `dir` / `checklist`） |
+| `template/<dir>/README.md` | 阶段目录与说明，须齐备「准入条件 / 推荐能力 / 准出产物」三节（第 12 节） |
+| `template/AGENTS.md` | 首行「四阶段」表述、目录结构、「阶段说明」的标题（显示名）与「推荐技能 / 推荐工具」行（第 11 节） |
+| `template/README.md`、`template/docs/README.md` | 首行表述与两张「阶段产物」汇总表 |
+| `scripts/validate.sh` | 第 3 节的 `stage_order` 断言；第 9 / 11 / 12 节的 `STAGES` 列表 |
+| `template/.trae/commands/advance.md` | 首阶段（discovery 的 Go/No-Go）与末阶段（operations 的归档）分支 |
+| `template/.trae/commands/init-project.md` | 目录创建清单与四阶段状态模板 |
+| `template/.trae/commands/status.md` | 「序号」示例（如 `2/4`） |
+
+`template/.trae/scripts/inject_status.py` **无需改动**——它按 `stage_order` 与 `len(stage_order)` 通用计算，不硬编码阶段数。
+
+改完执行：
+
+```bash
+bash scripts/gen-manifest.sh   # 载荷已变更，重新生成清单并同步版本号
+bash scripts/validate.sh       # 第 3 / 9 / 11 / 12 节会逐项核对上述一致性
+```
+
+> 阶段集合是模板的**结构约定**，不是运行时可选项。若只是想调整某阶段的产物或推荐能力，改对应 README 与状态文件即可，无需动阶段序。
+
 ## 决策记录
 
 涉及架构级选择（例如改变状态文件格式、增减阶段）时，请在 `docs/adr/` 新增一条记录，说明背景、备选方案与后果。
