@@ -35,6 +35,7 @@
 ├── scripts/
 │   ├── install.sh      安装到单个项目
 │   ├── setup-global.sh 全局安装
+│   ├── upgrade.sh      把项目升级到新版本
 │   ├── build-dist.sh   构建发布产物
 │   ├── gen-manifest.sh 生成/校验模板清单
 │   ├── validate.sh     校验模板完整性

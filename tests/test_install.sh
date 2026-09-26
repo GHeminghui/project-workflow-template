@@ -117,9 +117,11 @@ HOME="$FAKE_HOME" bash "$REPO_ROOT/scripts/setup-global.sh" >/dev/null 2>&1
 GDEST="$FAKE_HOME/.trae/templates/project-workflow"
 assert_file "全局载荷 AGENTS.md" "$GDEST/AGENTS.md"
 assert_file "全局安装器 install.sh" "$GDEST/install.sh"
+assert_file "全局升级脚本 upgrade.sh" "$GDEST/upgrade.sh"
 assert_file "全局命令 init-project.md" "$FAKE_HOME/.trae/commands/init-project.md"
 assert_file "全局命令 status.md" "$FAKE_HOME/.trae/commands/status.md"
 assert_file "全局命令 advance.md" "$FAKE_HOME/.trae/commands/advance.md"
+assert_file "全局命令 upgrade.md" "$FAKE_HOME/.trae/commands/upgrade.md"
 
 section "7. 全局安装器可独立工作（路径自适应）"
 TARGET2="$WORK/from-global"
@@ -130,11 +132,131 @@ assert_file "从全局安装器安装命令" "$TARGET2/.trae/commands/advance.md
 section "8. 全局命令引用的路径真实存在"
 REF_PATH="$FAKE_HOME/.trae/templates/project-workflow/install.sh"
 [[ -f "$REF_PATH" ]] && ok "命令引用的安装器存在: $REF_PATH" || bad "命令引用的安装器不存在"
+REF_UP="$FAKE_HOME/.trae/templates/project-workflow/upgrade.sh"
+[[ -f "$REF_UP" ]] && ok "命令引用的升级脚本存在: $REF_UP" || bad "命令引用的升级脚本不存在"
 
 section "9. 全局卸载"
 HOME="$FAKE_HOME" bash "$REPO_ROOT/scripts/setup-global.sh" --uninstall >/dev/null 2>&1
 [[ ! -f "$FAKE_HOME/.trae/commands/init-project.md" ]] && ok "全局命令已卸载" || bad "全局命令未卸载"
 [[ -d "$GDEST" ]] && ok "全局载荷保留" || bad "全局载荷被误删"
+
+# ---------- 升级工具测试夹具 ----------
+# 造一个"新版载荷"：版本 0.9.9，且 AGENTS.md 内容相对当前载荷发生变化
+UP_PAYLOAD="$WORK/upgrade-payload"
+UP_PROJ="$WORK/upgrade-proj"
+cp -R "$REPO_ROOT/template" "$UP_PAYLOAD"
+cp "$REPO_ROOT/scripts/upgrade.sh" "$UP_PAYLOAD/upgrade.sh"
+python3 - "$UP_PAYLOAD" <<'PY'
+import hashlib, json, os, sys
+payload = sys.argv[1]
+with open(os.path.join(payload, "AGENTS.md"), "a", encoding="utf-8") as f:
+    f.write("\n<!-- added in 0.9.9 -->\n")
+mp = os.path.join(payload, ".trae", "template-manifest.json")
+with open(mp, encoding="utf-8") as f:
+    m = json.load(f)
+m["template_version"] = "0.9.9"
+for item in m["files"]:
+    with open(os.path.join(payload, item["path"]), "rb") as f:
+        item["sha256"] = hashlib.sha256(f.read()).hexdigest()
+with open(mp, "w", encoding="utf-8") as f:
+    json.dump(m, f, ensure_ascii=False, indent=2)
+    f.write("\n")
+PY
+bash "$REPO_ROOT/scripts/install.sh" "$UP_PROJ" -n up-test >/dev/null 2>&1
+# 在项目侧制造三种状态：被用户改过 / 缺失 / 未改动
+printf '\n<!-- 用户自定义 -->\n' >> "$UP_PROJ/.trae/hooks.json"
+rm -f "$UP_PROJ/00-discovery/README.md"
+
+section "10. 升级工具：预览只读且判定准确"
+UP_OUT="$(bash "$UP_PAYLOAD/upgrade.sh" "$UP_PROJ" 2>&1)"; UP_RC=$?
+echo "$UP_OUT" | grep -q "~ AGENTS.md" && ok "未改动的 AGENTS.md 判为「覆盖」" || bad "AGENTS.md 未判为覆盖"
+echo "$UP_OUT" | grep -q "! .trae/hooks.json" && ok "被改过的 hooks.json 判为「待合并」" || bad "hooks.json 未判为待合并"
+echo "$UP_OUT" | grep -q "+ 00-discovery/README.md" && ok "缺失文件判为「恢复」" || bad "缺失文件未判为恢复"
+echo "$UP_OUT" | grep -q "= PROJECT_STATE.json" && ok "状态文件判为「不动」（用户数据）" || bad "状态文件未判为不动"
+[[ "$UP_RC" -eq 1 ]] && ok "预览发现差异时退出码为 1" || bad "退出码异常: $UP_RC"
+grep -q "added in 0.9.9" "$UP_PROJ/AGENTS.md" && bad "预览竟写入了文件" || ok "预览未写入任何文件"
+[[ -f "$UP_PROJ/00-discovery/README.md" ]] && bad "预览竟恢复了文件" || ok "预览未恢复文件"
+
+section "11. 升级工具：--apply 落盘、推进基线、保留进度与用户数据"
+python3 - "$UP_PROJ/PROJECT_STATE.json" <<'PY'
+import json, sys
+p = sys.argv[1]
+with open(p, encoding="utf-8") as f:
+    d = json.load(f)
+d["current_stage"] = "development"
+for it in d["stages"]["discovery"]["checklist"]:
+    it["done"] = True
+with open(p, "w", encoding="utf-8") as f:
+    json.dump(d, f, ensure_ascii=False, indent=2)
+PY
+bash "$UP_PAYLOAD/upgrade.sh" "$UP_PROJ" --apply >/dev/null 2>&1; UP_RC=$?
+grep -q "added in 0.9.9" "$UP_PROJ/AGENTS.md" && ok "未改动的文件已更新为新版" || bad "文件未更新"
+[[ -f "$UP_PROJ/00-discovery/README.md" ]] && ok "缺失文件已恢复" || bad "缺失文件未恢复"
+grep -q "用户自定义" "$UP_PROJ/.trae/hooks.json" && ok "用户改过的文件未被覆盖" || bad "用户改动被覆盖了"
+[[ "$UP_RC" -eq 1 ]] && ok "仍有待合并项时退出码为 1" || bad "退出码异常: $UP_RC"
+if python3 - "$UP_PROJ/.trae/template-manifest.json" "$UP_PROJ/PROJECT_STATE.json" <<'PY'
+import json, sys
+with open(sys.argv[1], encoding="utf-8") as f:
+    m = json.load(f)
+with open(sys.argv[2], encoding="utf-8") as f:
+    s = json.load(f)
+dis = s["stages"]["discovery"]
+ok = (m["template_version"] == "0.9.9"
+      and s.get("template_version") == "0.9.9"
+      and s.get("current_stage") == "development"
+      and all(i["done"] for i in dis["checklist"]))
+if not ok:
+    print(f"基线={m['template_version']} 状态版本={s.get('template_version')} "
+          f"阶段={s.get('current_stage')} 勾选={[i['done'] for i in dis['checklist']]}")
+sys.exit(0 if ok else 1)
+PY
+then
+  ok "基线推进至 0.9.9，且 PROJECT_STATE.json 进度完好（仅字段级更新）"
+else
+  bad "基线或进度异常"
+fi
+
+section "12. 升级工具：版本相同时短路，不重复提示用户改动"
+UP_OUT="$(bash "$UP_PAYLOAD/upgrade.sh" "$UP_PROJ" 2>&1)"; UP_RC=$?
+echo "$UP_OUT" | grep -q "已是最新（0.9.9）" && ok "报「已是最新」并短路" || bad "未短路"
+[[ "$UP_RC" -eq 0 ]] && ok "退出码 0" || bad "退出码异常: $UP_RC"
+echo "$UP_OUT" | grep -q "待合并" && bad "不应再重复提示用户改动" || ok "不再重复提示用户改动（符合规格 §5）"
+
+section "13. 升级工具：--force 在版本跃迁中备份后覆盖"
+# --force 只在版本跃迁期间有意义：版本一致时会被 §5 短路，故这里再升一版
+UP_PAYLOAD2="$WORK/upgrade-payload2"
+cp -R "$UP_PAYLOAD" "$UP_PAYLOAD2"
+python3 - "$UP_PAYLOAD2" <<'PY'
+import json, os, sys
+mp = os.path.join(sys.argv[1], ".trae", "template-manifest.json")
+with open(mp, encoding="utf-8") as f:
+    m = json.load(f)
+m["template_version"] = "0.9.10"
+with open(mp, "w", encoding="utf-8") as f:
+    json.dump(m, f, ensure_ascii=False, indent=2)
+    f.write("\n")
+PY
+bash "$UP_PAYLOAD2/upgrade.sh" "$UP_PROJ" --apply --force >/dev/null 2>&1; UP_RC=$?
+[[ "$UP_RC" -eq 0 ]] && ok "--force 处理后无待合并项，退出码 0" || bad "退出码异常: $UP_RC"
+cmp -s "$UP_PROJ/.trae/hooks.json" "$UP_PAYLOAD2/.trae/hooks.json" && ok "被改过的文件已覆盖为载荷版本" || bad "未被覆盖"
+grep -q "用户自定义" "$UP_PROJ/.trae/hooks.json.bak" && ok "覆盖前已备份 .bak 且保留用户改动" || bad ".bak 缺失或内容不对"
+python3 -c "
+import json,sys
+d=json.load(open('$UP_PROJ/PROJECT_STATE.json',encoding='utf-8'))
+sys.exit(0 if d.get('template_version')=='0.9.10' else 1)" \
+  && ok "项目版本推进至 0.9.10" || bad "项目版本未推进"
+
+section "14. 升级工具：缺少基线清单的老项目"
+OLD_PROJ="$WORK/old-proj"
+bash "$REPO_ROOT/scripts/install.sh" "$OLD_PROJ" -n old >/dev/null 2>&1
+rm -f "$OLD_PROJ/.trae/template-manifest.json"
+UP_OUT="$(bash "$UP_PAYLOAD/upgrade.sh" "$OLD_PROJ" 2>&1)"; UP_RC=$?
+echo "$UP_OUT" | grep -q "缺少基线清单" && ok "报告说明了缺少基线的原因" || bad "未提示缺少基线"
+echo "$UP_OUT" | grep -q "! AGENTS.md" && ok "已存在文件一律判为「待合并」" || bad "未按待合并处理"
+[[ "$UP_RC" -eq 1 ]] && ok "退出码为 1" || bad "退出码异常: $UP_RC"
+bash "$UP_PAYLOAD/upgrade.sh" "$OLD_PROJ" --apply --force >/dev/null 2>&1
+[[ -f "$OLD_PROJ/.trae/template-manifest.json" ]] && ok "首次 --force 升级后已建立基线" || bad "基线未建立"
+bash "$UP_PAYLOAD/upgrade.sh" "$OLD_PROJ" >/dev/null 2>&1 && ok "建立基线后恢复精确判定（已是最新）" || bad "基线建立后仍无法判定"
 
 echo
 echo "========================================"

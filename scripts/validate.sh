@@ -36,6 +36,7 @@ required=(
   "template/03-operations/README.md"
   "scripts/install.sh"
   "scripts/setup-global.sh"
+  "scripts/upgrade.sh"
   "scripts/gen-manifest.sh"
   "AGENTS.md"
   "README.md"
@@ -120,7 +121,7 @@ done
 [[ $leaked -eq 0 ]] && ok "载荷未泄漏开发层内容"
 
 section "5. 脚本语法与可执行性"
-for s in "scripts/install.sh" "scripts/setup-global.sh" "scripts/build-dist.sh" "scripts/gen-manifest.sh" "scripts/validate.sh" "tests/test_install.sh"; do
+for s in "scripts/install.sh" "scripts/setup-global.sh" "scripts/upgrade.sh" "scripts/build-dist.sh" "scripts/gen-manifest.sh" "scripts/validate.sh" "tests/test_install.sh"; do
   if [[ -f "$REPO_ROOT/$s" ]]; then
     bash -n "$REPO_ROOT/$s" 2>/dev/null && ok "$s 语法正确" || bad "$s 语法错误"
   fi
@@ -137,6 +138,16 @@ if grep -q "templates/project-workflow" "$REPO_ROOT/scripts/setup-global.sh"; th
   ok "setup-global 安装目标包含 templates/project-workflow"
 else
   bad "setup-global 安装目标与命令引用不一致"
+fi
+if grep -qE '\$HOME/\.(trae|trae-cn)/templates/project-workflow/upgrade\.sh' "$TEMPLATE/.trae/commands/upgrade.md"; then
+  ok "upgrade 引用了全局升级脚本"
+else
+  bad "upgrade.md 未引用全局升级脚本路径"
+fi
+if grep -q "upgrade\.sh\|upgrade.sh" "$REPO_ROOT/scripts/setup-global.sh"; then
+  ok "setup-global 一并安装 upgrade.sh"
+else
+  bad "setup-global 未安装 upgrade.sh，/upgrade 将失效"
 fi
 
 section "7. 状态注入脚本可运行"

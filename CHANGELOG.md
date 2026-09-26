@@ -14,6 +14,7 @@
 - 新增 `VERSION`（模板版本单一数据源）与 `scripts/gen-manifest.sh`（生成/校验模板清单）
 - 生成并提交 `template/.trae/template-manifest.json`（文件边界 + 基线哈希 + 版本号）
 - 新增 `docs/specs/upgrade-tool.md`：冻结升级工具的入口、CLI、文件状态→动作矩阵、报告格式与退出码
+- 新增 `scripts/upgrade.sh` 与 `/upgrade` 命令（`template/.trae/commands/upgrade.md`）：把项目内模板文件升级到新版本，默认只读预览，`--apply` 落盘，`--force` 才覆盖被改过的文件（先备份 `.bak`）
 
 ### Changed
 - `CONTRIBUTING.md` 新增「PR 与标签」标签约定，流程补充 PR 步骤，并说明两个 `release.yml` 的区别

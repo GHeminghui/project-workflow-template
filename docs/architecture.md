@@ -17,6 +17,7 @@ project-workflow-template/          仓库根 = 开发层
 ├── scripts/                        维护与安装脚本
 │   ├── install.sh                  安装载荷到目标项目（路径自适应）
 │   ├── setup-global.sh             全局安装（载荷 + 命令）
+│   ├── upgrade.sh                  把项目升级到新版本（默认只读）
 │   ├── build-dist.sh               构建发布产物（仅打包 git 跟踪文件）
 │   ├── gen-manifest.sh             生成/校验模板清单
 │   ├── validate.sh                 校验模板完整性
@@ -37,7 +38,7 @@ project-workflow-template/          仓库根 = 开发层
     │   ├── hooks.json              SessionStart 事件配置
     │   ├── template-manifest.json  模板清单（文件边界 + 基线哈希 + 版本）
     │   ├── scripts/inject_status.py 状态渲染脚本
-    │   └── commands/               /init-project /status /advance
+    │   └── commands/               /init-project /status /advance /upgrade
     ├── 00-discovery/ ~ 03-operations/  四阶段目录 + 说明
     └── docs/                       用户项目的文档与 ADR 模板
 ```
@@ -138,6 +139,32 @@ Release 页面：按 PR 标签归类的 notes + 三个分发产物
 
 **关键点**：门控在打包之前，坏 tag 不会产出产物；Release 步骤幂等，失败重跑不会因「Release 已存在」二次报错。产物内容以 `git ls-files` 跟踪文件为准，未跟踪文件（如 `.DS_Store`）不会进入 `bootstrap.sh` 或压缩包，本地与 CI 构建结果一致。notes 的分类规则来自 `.github/release.yml`，依据 PR 标签归类。
 
+### 2.5 升级（upgrade.sh）
+
+```
+在项目内运行 /upgrade 或 upgrade.sh [目标目录]
+   │
+   ▼
+定位载荷（同 install.sh）：仓库内 -> ../template；全局模板目录内 -> 同级
+   │
+   ▼
+读两份清单：项目内基线（判「是否被改过」）+ 载荷清单（判「是否已是最新」）
+   │  版本相同 ──► 报「已是最新」并退出，不逐文件扫描
+   ▼
+逐文件判定 → 覆盖 / 恢复 / 待合并 / 不动 / 未变更，输出报告
+   │  默认只读，不写任何文件；退出码 1 表示存在待处理项
+   ▼
+--apply 落盘
+   │  · 覆盖未改动文件、恢复缺失文件
+   │  · --force 才覆盖「被改过」的文件（先备份 .bak）
+   │  · 替换项目内清单，基线前进到新版本
+   │  · 字段级更新 PROJECT_STATE.json 的 template_version（绝不整体覆盖）
+   ▼
+下次升级即可精确判定
+```
+
+**关键点**：默认只读、且永不交互——它同时被人与 AI（经 `/upgrade` 命令）调用，人机确认由命令文档承担。判定**必须用两份清单**：只跟新版比会把用户的正常改动误判为「被改过」。
+
 ## 3. 文件职责速查
 
 | 文件 | 职责 | 改动时需同步 |
@@ -147,8 +174,10 @@ Release 页面：按 PR 标签归类的 notes + 三个分发产物
 | `template/.trae/hooks.json` | 事件绑定 | `template/.trae/scripts/*` |
 | `inject_status.py` | 状态渲染 | `PROJECT_STATE.json` 结构 |
 | `commands/init-project.md` | 安装入口 | `scripts/setup-global.sh` 的安装路径 |
+| `commands/upgrade.md` | 升级入口 | `scripts/setup-global.sh` 的安装路径、`docs/specs/upgrade-tool.md` |
 | `scripts/install.sh` | 载荷分发 | `template/` 文件清单 |
-| `scripts/setup-global.sh` | 全局安装 | `commands/init-project.md` 引用路径 |
+| `scripts/setup-global.sh` | 全局安装 | `commands/init-project.md`、`commands/upgrade.md` 的引用路径 |
+| `scripts/upgrade.sh` | 升级项目内模板文件 | `docs/specs/upgrade-tool.md`、`VERSION`、模板清单 |
 | `scripts/validate.sh` | 完整性校验 | `template/` 结构与状态字段 |
 | `scripts/gen-manifest.sh` | 生成/校验模板清单 | `VERSION`、`template/.trae/template-manifest.json`、`validate.sh` |
 | `VERSION` | 模板版本单一数据源 | `scripts/gen-manifest.sh`、`CONTRIBUTING.md` 发版流程 |
