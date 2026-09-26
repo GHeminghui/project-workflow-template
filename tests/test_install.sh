@@ -57,9 +57,43 @@ echo "CUSTOM" > "$TARGET/AGENTS.md"
 bash "$REPO_ROOT/scripts/install.sh" "$TARGET" >/dev/null 2>&1
 grep -q "CUSTOM" "$TARGET/AGENTS.md" && ok "已存在文件未被覆盖" || bad "已存在文件被误覆盖"
 
-section "5. --force 覆盖已存在文件"
+section "5. --force 覆盖模板文件，但不得破坏 PROJECT_STATE.json"
+# 先在状态文件里写入一份"用户进度"，再执行 -f，验证进度不被清空
+python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
+import json, sys
+p = sys.argv[1]
+with open(p, encoding="utf-8") as f:
+    d = json.load(f)
+d["current_stage"] = "design"
+d["stages"]["discovery"]["status"] = "done"
+for it in d["stages"]["discovery"]["checklist"]:
+    it["done"] = True
+d["stages"]["discovery"]["deliverables"] = ["00-discovery/research.md"]
+with open(p, "w", encoding="utf-8") as f:
+    json.dump(d, f, ensure_ascii=False, indent=2)
+PY
 bash "$REPO_ROOT/scripts/install.sh" "$TARGET" -f >/dev/null 2>&1
-grep -q "CUSTOM" "$TARGET/AGENTS.md" && bad "--force 未生效" || ok "--force 成功覆盖"
+grep -q "CUSTOM" "$TARGET/AGENTS.md" && bad "--force 未生效" || ok "--force 成功覆盖模板文件 AGENTS.md"
+if command -v python3 >/dev/null 2>&1; then
+  if python3 - "$TARGET/PROJECT_STATE.json" <<'PY'
+import json, sys
+d = json.load(open(sys.argv[1], encoding="utf-8"))
+dis = d["stages"]["discovery"]
+ok = (d.get("current_stage") == "design"
+      and dis.get("status") == "done"
+      and all(i["done"] for i in dis["checklist"])
+      and len(dis.get("deliverables", [])) == 1)
+if not ok:
+    print(f"current_stage={d.get('current_stage')} status={dis.get('status')} "
+          f"checklist={[i['done'] for i in dis['checklist']]} deliverables={dis.get('deliverables')}")
+sys.exit(0 if ok else 1)
+PY
+  then
+    ok "--force 未破坏 PROJECT_STATE.json（进度完整保留）"
+  else
+    bad "--force 破坏了 PROJECT_STATE.json"
+  fi
+fi
 
 section "6. 全局安装（模拟 HOME）"
 FAKE_HOME="$WORK/home"

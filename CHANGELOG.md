@@ -16,6 +16,10 @@
 - CI 与发布工作流升级 action 版本以适配 Node 24：`actions/checkout` v4→v5、`actions/setup-python` v5→v6
 - `README.md` 仓库结构树补充 `.github/` 目录
 
+### Fixed
+- `scripts/install.sh` 的 `--force` 不再整体覆盖 `PROJECT_STATE.json`：该文件承载项目进度、属用户数据，改为仅在不存在时写入初始模板，已存在时仅在显式传 `-n` 时更新 `project_name` 单个字段。修复 `--force` 清空 `current_stage`／清单勾选／`deliverables` 的数据丢失问题（见 `docs/adr/002-upgrade-strategy.md`）
+- `tests/test_install.sh` 第 5 节新增断言，防止上述数据丢失问题回归
+
 ## [0.1.2] - 2026-09-26
 
 ### Changed

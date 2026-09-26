@@ -6,7 +6,7 @@
 #
 # 选项:
 #   -n, --name <名称>   指定项目名（默认取目标目录名）
-#   -f, --force         覆盖已存在的文件
+#   -f, --force         覆盖已存在的模板文件（不含 PROJECT_STATE.json，它属用户数据）
 #   -h, --help          显示帮助
 #
 # 示例:
@@ -32,6 +32,7 @@ fi
 
 TARGET_DIR=""
 PROJECT_NAME=""
+NAME_GIVEN=0
 FORCE=0
 
 usage() {
@@ -41,7 +42,7 @@ usage() {
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -n|--name) PROJECT_NAME="$2"; shift 2 ;;
+    -n|--name) PROJECT_NAME="$2"; NAME_GIVEN=1; shift 2 ;;
     -f|--force) FORCE=1; shift ;;
     -h|--help) usage ;;
     -*) echo "未知选项: $1" >&2; usage ;;
@@ -86,7 +87,18 @@ done
 
 echo "==> 复制载荷文件"
 copy_file "AGENTS.md"
-copy_file "PROJECT_STATE.json"
+
+# PROJECT_STATE.json 属用户数据（承载项目进度），仅在不存在时写入初始模板；
+# 即使指定 --force 也不整体覆盖，否则会清空 current_stage / checklist / deliverables。
+if [[ -e "$TARGET_DIR/PROJECT_STATE.json" ]]; then
+  STATE_PREEXISTING=1
+  echo "    [保留] 已存在: PROJECT_STATE.json（用户数据，不覆盖）"
+else
+  STATE_PREEXISTING=0
+  cp "$PAYLOAD/PROJECT_STATE.json" "$TARGET_DIR/PROJECT_STATE.json"
+  echo "    [写入] PROJECT_STATE.json"
+fi
+
 copy_file "README.md"
 copy_file ".gitignore"
 copy_file "docs/README.md"
@@ -102,26 +114,47 @@ for stage in 00-discovery 01-design 02-development 03-operations; do
   copy_file "$stage/README.md"
 done
 
-echo "==> 写入项目名称到 PROJECT_STATE.json"
+echo "==> 处理 PROJECT_STATE.json"
 if command -v python3 >/dev/null 2>&1; then
-  python3 - "$TARGET_DIR/PROJECT_STATE.json" "$PROJECT_NAME" <<'PY'
+  python3 - "$TARGET_DIR/PROJECT_STATE.json" "$PROJECT_NAME" "$STATE_PREEXISTING" "$NAME_GIVEN" <<'PY'
 import json, sys, datetime
+
 path, name = sys.argv[1], sys.argv[2]
+preexisting = sys.argv[3] == "1"
+name_given = sys.argv[4] == "1"
+
 with open(path, "r", encoding="utf-8") as f:
     data = json.load(f)
+
 today = datetime.date.today().isoformat()
-data["project_name"] = name
-data["created_at"] = today
-if data.get("current_stage") in data.get("stages", {}):
-    data["stages"][data["current_stage"]]["started_at"] = today
-data["last_updated"] = today
-with open(path, "w", encoding="utf-8") as f:
-    json.dump(data, f, ensure_ascii=False, indent=2)
-    f.write("\n")
-print("    已更新 project_name =", name)
+changed = False
+
+if not preexisting:
+    # 全新安装：写入初始状态的元信息
+    data["project_name"] = name
+    data["created_at"] = today
+    if data.get("current_stage") in data.get("stages", {}):
+        data["stages"][data["current_stage"]]["started_at"] = today
+    data["last_updated"] = today
+    changed = True
+    print(f"    已初始化 project_name = {name}")
+elif name_given and data.get("project_name") != name:
+    # 已存在的项目：仅在用户显式传 -n 时做单字段更新，绝不触碰进度字段
+    old = data.get("project_name")
+    data["project_name"] = name
+    data["last_updated"] = today
+    changed = True
+    print(f"    已更新 project_name: {old} -> {name}（进度字段未改动）")
+else:
+    print("    保留原有状态：current_stage / checklist / deliverables 均未改动")
+
+if changed:
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+        f.write("\n")
 PY
 else
-  echo "    [警告] 未找到 python3，请手动修改 PROJECT_STATE.json 中的 project_name"
+  echo "    [警告] 未找到 python3，跳过状态处理"
 fi
 
 chmod +x "$TARGET_DIR/.trae/scripts/inject_status.py" 2>/dev/null || true
