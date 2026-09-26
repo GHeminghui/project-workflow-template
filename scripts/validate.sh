@@ -46,6 +46,7 @@ required=(
   "docs/design.md"
   "docs/architecture.md"
   "docs/specs/template-manifest.md"
+  "docs/specs/upgrade-tool.md"
 )
 for f in "${required[@]}"; do
   [[ -e "$REPO_ROOT/$f" ]] && ok "$f" || bad "缺失: $f"

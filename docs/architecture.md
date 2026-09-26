@@ -158,7 +158,8 @@ Release 页面：按 PR 标签归类的 notes + 三个分发产物
 | `.github/workflows/release.yml` | 发布（tag 触发打包与 Release） | `scripts/build-dist.sh`、tag 命名规范 |
 | `.github/release.yml` | Release notes 分类配置（按 PR 标签归类） | `CONTRIBUTING.md` 的标签约定 |
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR 模板 | `CONTRIBUTING.md` 的流程与标签约定 |
-| `docs/specs/template-manifest.md` | 模板清单的路径与格式规格 | `scripts/install.sh`、升级工具、清单一致性校验 |
+| `docs/specs/template-manifest.md` | 模板清单的数据契约（路径、字段、生成与校验） | `scripts/install.sh`、`scripts/gen-manifest.sh`、清单一致性校验 |
+| `docs/specs/upgrade-tool.md` | 升级工具的行为契约（调用方式、动作策略、报告、退出码） | `scripts/upgrade.sh`、`template/.trae/commands/upgrade.md` |
 
 ## 4. 路径自适应约定
 

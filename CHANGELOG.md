@@ -13,6 +13,7 @@
 - 新增 `docs/specs/` 目录与规格文档约定，`AGENTS.md` 改动工作流同步补充第 6 条
 - 新增 `VERSION`（模板版本单一数据源）与 `scripts/gen-manifest.sh`（生成/校验模板清单）
 - 生成并提交 `template/.trae/template-manifest.json`（文件边界 + 基线哈希 + 版本号）
+- 新增 `docs/specs/upgrade-tool.md`：冻结升级工具的入口、CLI、文件状态→动作矩阵、报告格式与退出码
 
 ### Changed
 - `CONTRIBUTING.md` 新增「PR 与标签」标签约定，流程补充 PR 步骤，并说明两个 `release.yml` 的区别
@@ -24,6 +25,7 @@
 - `scripts/validate.sh` 新增第 8 节「清单 ↔ 载荷 ↔ 版本号」一致性校验，脚本语法检查补入 `build-dist.sh`、`gen-manifest.sh`
 - `CONTRIBUTING.md` 发布流程补充版本对齐步骤（改 `VERSION` → 重生成清单 → 验证），并新增 Shell 约定
 - `docs/design.md` 补充「升级策略」一节，补齐此前的设计空白
+- `docs/specs/template-manifest.md` §8 的动作策略移入升级工具规格（消除重复）；其中「文件缺失」的默认动作由「不恢复」改为「恢复」——恢复不构成数据丢失
 
 ### Fixed
 - `scripts/install.sh` 的 `--force` 不再整体覆盖 `PROJECT_STATE.json`：该文件承载项目进度、属用户数据，改为仅在不存在时写入初始模板，已存在时仅在显式传 `-n` 时更新 `project_name` 单个字段。修复 `--force` 清空 `current_stage`／清单勾选／`deliverables` 的数据丢失问题（见 `docs/adr/002-upgrade-strategy.md`）
