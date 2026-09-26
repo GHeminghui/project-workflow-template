@@ -46,6 +46,7 @@ required=(
   "VERSION"
   "docs/design.md"
   "docs/architecture.md"
+  "docs/specs/project-state.md"
   "docs/specs/template-manifest.md"
   "docs/specs/upgrade-tool.md"
 )
@@ -519,6 +520,60 @@ PY
     ok "/advance 的提交步骤同时包含阶段产物与状态文件"
   else
     bad "/advance 的提交步骤会把阶段产物留在版本库外"
+    echo "$OUT" | sed 's/^/     /'
+  fi
+else
+  bad "未找到 python3，跳过"
+fi
+
+section "14. ADR 规则与模板一致（AGENTS.md ↔ docs/adr/000-template.md）"
+if command -v python3 >/dev/null 2>&1; then
+  OUT=$(python3 - "$TEMPLATE" <<'PY'
+import os
+import re
+import sys
+
+root = sys.argv[1]
+with open(os.path.join(root, "AGENTS.md"), encoding="utf-8") as f:
+    agents = f.read()
+with open(os.path.join(root, "docs", "adr", "000-template.md"), encoding="utf-8") as f:
+    tpl = f.read()
+
+line = ""
+for l in agents.splitlines():
+    if "关键决策" in l and "docs/adr" in l:
+        line = l
+        break
+
+errors = []
+if not line:
+    errors.append("AGENTS.md 未找到 ADR 规则行（应含「关键决策」与 docs/adr）")
+else:
+    if "000-template.md" not in line:
+        errors.append("ADR 规则未指向 docs/adr/000-template.md（不应自行罗列格式，否则会与模板脱节）")
+    m = re.search(r"（([^）]*)）", line)
+    if not m:
+        errors.append("ADR 规则未注明小节名（形如「（背景 / 决策 / 后果）」）")
+    else:
+        names = [x.strip() for x in re.split(r"[/／]", m.group(1)) if x.strip()]
+        heads = set(re.findall(r"^##\s+(.+?)\s*$", tpl, re.M))
+        missing = [n for n in names if n not in heads]
+        if missing:
+            errors.append("AGENTS.md 提到的 ADR 小节在 docs/adr/000-template.md 中不存在: "
+                          + "、".join(missing))
+
+if errors:
+    for e in errors:
+        print("  ❌ " + e)
+    print("  ADR 规则应与 docs/adr/000-template.md 保持一致")
+    sys.exit(1)
+sys.exit(0)
+PY
+)
+  if [[ $? -eq 0 ]]; then
+    ok "AGENTS.md 的 ADR 规则指向模板，且所提小节真实存在"
+  else
+    bad "ADR 规则与 docs/adr/000-template.md 不一致"
     echo "$OUT" | sed 's/^/     /'
   fi
 else
