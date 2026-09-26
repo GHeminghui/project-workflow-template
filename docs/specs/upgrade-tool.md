@@ -193,5 +193,6 @@ bash upgrade.sh [目标目录] [选项]
 ## 10. 相关
 
 - [ADR-002: 模板升级策略](../adr/002-upgrade-strategy.md)
+- [docs/specs/project-state.md](project-state.md)——`template_version` 字段的契约
 - [docs/specs/template-manifest.md](template-manifest.md)
 - [docs/design.md](../design.md)

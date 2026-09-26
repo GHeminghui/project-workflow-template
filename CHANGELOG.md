@@ -8,12 +8,19 @@
 - **`PROJECT_STATE.json` 新增 `stages.discovery.decision` 字段**（`pending` / `go` / `no-go`）：把 Go/No-Go 结论从「AI 解读 `decision.md` 措辞」改为**确定性字段判定**——此前它是整套「状态单一数据源」之外唯一的软肋（dogfooding 发现项 F4，决策见 `docs/adr/003-discovery-decision-field.md`）
 - `scripts/validate.sh` 第 3 节新增校验：`discovery.decision` 必须存在且取值合法，且 `project_status: rejected` 必然对应 `decision: no-go`
 - `tests/test_install.sh` 新增第 16 节：判定字段初值、Hook 展示、No-Go 渲染、缺字段的向后兼容
+- `docs/specs/project-state.md`（新增）：`PROJECT_STATE.json` 的**数据契约**——顶层与阶段字段、取值、不变量（并区分「第 3 节强制」与「约定」）、写入规则与向后兼容；已登记进 `validate.sh` 第 1 节与 `architecture.md` 职责表
+- `scripts/validate.sh` 新增第 14 节：`AGENTS.md` 的 ADR 规则必须**指向** `docs/adr/000-template.md`，且其中提到的小节必须在该模板中真实存在
 
 ### Changed
 - `template/.trae/commands/advance.md` 第 5 步改为依 `decision` 字段分支；`pending` 或字段缺失（老项目）时读 `decision.md` 并请用户确认，**先把结论写入字段**再推进——不再替用户判定
 - `inject_status.py` 在会话开始即展示 Go/No-Go 判定；`/status` 同步展示；`AGENTS.md` 的「状态维护」补充该字段说明
 - `docs/design.md`、`docs/architecture.md` 补充设计理由与数据流说明
-- `VERSION` 推进至 `0.7.0`（本段改动触及载荷）
+- `AGENTS.md` 规则 6 由「轻量 ADR 格式（背景 / 决策 / 后果）」改为**指向** `docs/adr/000-template.md`——原描述漏了模板实际要求的「备选方案」等小节，照它写出的 ADR 与模板不符（dogfooding 发现项 F5；仓库自己的 ADR 其实都按模板写）
+- 开发阶段准出与门控文案澄清「测试通过」的验证边界（dogfooding 发现项 F3）：`tests/` 目录存在 ≠ 测试通过，门控不代运行
+- `VERSION` 推进至 `0.7.1`（本段多次触及载荷，逐次推进）
+
+### Fixed
+- `AGENTS.md` 规则 7 补充约束：产物存在只证明「已落地」，不证明某项声称的**结果**成立；结果性项须**实际运行/验证取得结果**后再勾选
 
 ## [0.6.1] - 2026-09-26
 
