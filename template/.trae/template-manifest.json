@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "template_name": "project-workflow-template",
-  "template_version": "0.4.0",
+  "template_version": "0.5.0",
   "files": [
     {
       "path": ".gitignore",
@@ -9,7 +9,7 @@
     },
     {
       "path": ".trae/commands/advance.md",
-      "sha256": "42bee90fb385c6314319fef140abb747a720ca4bc9dcadcbcdba2d58db5faefe"
+      "sha256": "7e36d3aa3d24503c7d1d4730091c479279ebb5698c8b70352e1e5973aa0229e2"
     },
     {
       "path": ".trae/commands/init-project.md",
@@ -17,7 +17,7 @@
     },
     {
       "path": ".trae/commands/status.md",
-      "sha256": "3640ac22fe485f7ad46de52498bca4b389ed4586e8e9ff0806522fc5d9f56bf2"
+      "sha256": "fc34c2d8d342688de90caa6e5c3956a311260fc643009e5c06196d4f8cd8e73f"
     },
     {
       "path": ".trae/commands/upgrade.md",
@@ -29,7 +29,7 @@
     },
     {
       "path": ".trae/scripts/inject_status.py",
-      "sha256": "179087efef0fd929ffd65d9d363905b267266e69bc64329103ef0efba0642da2"
+      "sha256": "6368e3c957ca690ac2444d8d9985266174d8c3643a2291d4aaa7d9814476d1dc"
     },
     {
       "path": "00-discovery/README.md",
@@ -45,15 +45,15 @@
     },
     {
       "path": "03-operations/README.md",
-      "sha256": "aee31434fa6e60cb8e68d32dd2f00cf3149ae68d50589318e759467685546df0"
+      "sha256": "5d44bcdaf3ea0baed8a7fe7225f4c3e59592bdd520cb5fd663ec7f05272ddd5d"
     },
     {
       "path": "AGENTS.md",
-      "sha256": "717fcfc0106aedc3ee320dd8c11a4679086cad38efb73732869cdb443c8c722b"
+      "sha256": "bcb129eea52b18397ace6086ab25963fa21c84523f3f9145233dea585de9cd30"
     },
     {
       "path": "PROJECT_STATE.json",
-      "sha256": "f7f77f07adaecabc5ded18efd1fa8634e2037b02df0c36310c7733c15a4fcbee",
+      "sha256": "c36c4256f6bb51b818c77f2f645f21dca1a1fad9a7eff20741390883fc81e623",
       "mode": "create-only"
     },
     {

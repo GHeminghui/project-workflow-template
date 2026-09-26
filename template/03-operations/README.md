@@ -1,7 +1,7 @@
 # 阶段 4：运营（Operations）
 
 ## 目标
-部署上线，并持续监控、迭代。
+部署上线，并持续监控运行。
 
 ## 准入条件
 - 开发阶段已完成并通过 `/advance` 推进
@@ -21,4 +21,8 @@
 
 ## 完成标准
 上线验证通过，`PROJECT_STATE.json` 中 `operations` 阶段的 checklist 全部勾选。
-至此整个流程完成，可运行 `/status` 回顾，或归档项目。
+至此整个流程完成，可运行 `/status` 回顾；归档由 `/advance` 完成——它会询问是否把 `project_status` 置为 `archived`。
+
+## 关于迭代
+
+本流程不做阶段回退。上线后如需迭代，见 `AGENTS.md` 的「关于迭代」。
