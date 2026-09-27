@@ -3,7 +3,7 @@
 #
 # 安装内容:
 #   1. 载荷 + 安装器 -> ~/.trae/templates/project-workflow/
-#   2. 全局命令      -> ~/.trae/commands/  (init-project / status / advance)
+#   2. 全局命令      -> ~/.trae/commands/  (载荷 .trae/commands/ 下的全部命令)
 #
 # 用法:
 #   bash scripts/setup-global.sh               # 安装
@@ -32,10 +32,12 @@ COMMANDS_DEST="$TRAE_HOME/commands"
 
 if [[ "${1:-}" == "--uninstall" ]]; then
   echo "==> 卸载全局命令"
-  for c in init-project status advance; do
-    if [[ -f "$COMMANDS_DEST/$c.md" ]]; then
-      rm -f "$COMMANDS_DEST/$c.md"
-      echo "    已删除 $COMMANDS_DEST/$c.md"
+  for cmd in "$PAYLOAD"/.trae/commands/*.md; do
+    [[ -e "$cmd" ]] || continue
+    base="$(basename "$cmd")"
+    if [[ -f "$COMMANDS_DEST/$base" ]]; then
+      rm -f "$COMMANDS_DEST/$base"
+      echo "    已删除 $COMMANDS_DEST/$base"
     fi
   done
   echo "==> 载荷保留在: $TEMPLATE_DEST"

@@ -52,7 +52,16 @@
 bash scripts/setup-global.sh
 ```
 
-安装后模板置于 `~/.trae/templates/project-workflow/`，`/init-project`、`/status`、`/advance` 在**所有项目**可用。
+安装后模板置于 `~/.trae/templates/project-workflow/`，
+`/init-project`、`/status`、`/advance`、`/upgrade` 在**所有项目**可用。
+
+> **Trae CN 用户注意**：脚本默认写入 `~/.trae`，而 Trae CN 读取的是 `~/.trae-cn`，需显式指定配置目录：
+>
+> ```bash
+> TRAE_HOME="$HOME/.trae-cn" bash scripts/setup-global.sh
+> ```
+>
+> 不加这个变量**不会报错**，但命令会被装到 Trae CN 读取不到的位置，表现为 `/init-project` 始终不出现。
 
 ### 安装到单个项目
 
