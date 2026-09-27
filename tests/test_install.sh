@@ -364,6 +364,31 @@ d["stages"]["discovery"]["decision"] = "pending"
 json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 PY
 
+section "17. setup-global 安装/卸载对称性"
+FAKE_TRAE="$WORK/fake-trae"
+TRAE_HOME="$FAKE_TRAE" bash "$REPO_ROOT/scripts/setup-global.sh" >/dev/null 2>&1
+CMD_DEST="$FAKE_TRAE/commands"
+TPL_DEST="$FAKE_TRAE/templates/project-workflow"
+
+PAYLOAD_CMDS=()
+for c in "$REPO_ROOT"/template/.trae/commands/*.md; do
+  PAYLOAD_CMDS+=("$(basename "$c")")
+done
+MISSING=""
+for c in "${PAYLOAD_CMDS[@]}"; do
+  [[ -f "$CMD_DEST/$c" ]] || MISSING="$MISSING $c"
+done
+[[ -z "$MISSING" ]] && ok "安装覆盖载荷全部命令（${#PAYLOAD_CMDS[@]} 个）" || bad "安装漏装命令:$MISSING"
+
+for f in install.sh upgrade.sh AGENTS.md .trae/template-manifest.json; do
+  assert_file "载荷随附 $f" "$TPL_DEST/$f"
+done
+
+TRAE_HOME="$FAKE_TRAE" bash "$REPO_ROOT/scripts/setup-global.sh" --uninstall >/dev/null 2>&1
+LEFT="$(ls -1 "$CMD_DEST" 2>/dev/null | wc -l | tr -d ' ')"
+[[ "$LEFT" == "0" ]] && ok "卸载后全局命令无残留" || bad "卸载后仍残留 $LEFT 个命令"
+[[ -d "$TPL_DEST" ]] && ok "卸载保留载荷目录" || bad "卸载误删载荷目录"
+
 echo
 echo "========================================"
 echo "  测试结果: 通过 $PASS 项，失败 $FAIL 项"
