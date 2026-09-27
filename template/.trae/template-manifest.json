@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "template_name": "project-workflow-template",
-  "template_version": "0.7.2",
+  "template_version": "0.7.3",
   "files": [
     {
       "path": ".gitignore",
@@ -53,7 +53,7 @@
     },
     {
       "path": "PROJECT_STATE.json",
-      "sha256": "4133dc3e350fe949522fe0b549fb8acec9739e05091908512fdcd82b59684afb",
+      "sha256": "fb14b4ddd7881719873a32cfec17da378da623e0f4d7efdfe03e070b21f552fc",
       "mode": "create-only"
     },
     {

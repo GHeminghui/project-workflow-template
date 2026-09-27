@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.7.3] - 2026-09-26
+
 ### Fixed
 - `setup-global.sh --uninstall` 漏删 `upgrade`：安装会复制 4 个命令（`advance` / `init-project` / `status` / `upgrade`），卸载却只遍历 3 个，导致卸载后 `/upgrade` 仍残留。现卸载改为**遍历载荷的命令目录**，与安装逻辑同源，杜绝再次漂移；`tests/test_install.sh` 新增第 17 节做安装/卸载对称性校验
 
@@ -11,6 +13,7 @@
 - `CONTRIBUTING.md` 的「分支保护」由「待设置」改为**已生效**，并把核对到的实际配置写进文档（Ruleset `protect-main` / active；规则 `deletion` + `non_fast_forward` + `pull_request`（0 审批）+ 两条必需检查；Bypass = `Repository admin` / `always`；目标 = 默认分支）
 - 更正原先「token 无法读写分支保护配置」的说法：**读** ruleset 用集成 token 即可，只有**写**（改规则）才需要 `administration` 权限；并提醒不要误用已废弃的 `/branches/main/protection` 端点
 - 根 `README.md` 的「全局安装」补上遗漏的 `/upgrade`，并新增 **Trae CN 注意**：脚本默认写 `~/.trae`，而 Trae CN 读 `~/.trae-cn`，需 `TRAE_HOME="$HOME/.trae-cn"`；不加不会报错，但命令会装到读不到的位置
+- `VERSION` 推进至 `0.7.3`
 
 ## [0.7.2] - 2026-09-26
 
