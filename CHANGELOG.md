@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Changed
+- `CONTRIBUTING.md` 的「分支保护」由「待设置」改为**已生效**，并把核对到的实际配置写进文档（Ruleset `protect-main` / active；规则 `deletion` + `non_fast_forward` + `pull_request`（0 审批）+ 两条必需检查；Bypass = `Repository admin` / `always`；目标 = 默认分支）
+- 更正原先「token 无法读写分支保护配置」的说法：**读** ruleset 用集成 token 即可，只有**写**（改规则）才需要 `administration` 权限；并提醒不要误用已废弃的 `/branches/main/protection` 端点
+
 ## [0.7.2] - 2026-09-26
 
 ### Changed

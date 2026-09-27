@@ -60,8 +60,8 @@
 
 ## 分支保护
 
-`main` 是受保护分支（在仓库 **Settings → Rules → Rulesets → New branch ruleset** 中配置，
-GitHub 现在以 Rulesets 承载此类规则）。约定如下，目的是「对贡献者严格、对维护者保留发布后门」：
+`main` **已启用**分支保护（Ruleset `protect-main`，状态 **active**，目标为默认分支）。GitHub 现以 Rulesets
+承载此类规则（仓库 **Settings → Rules → Rulesets**）。约定如下，目的是「对贡献者严格、对维护者保留发布后门」：
 
 | 规则 | 设置 | 理由 |
 |------|------|------|
@@ -87,8 +87,20 @@ GitHub 现在以 Rulesets 承载此类规则）。约定如下，目的是「对
 bypass 直推 `main`，**不走 PR**。原因是这条提交本身就是为生成 release notes 而生，若走 PR 会
 被归类进它自己的 release notes 里，不干净。除它之外的所有改动一律走 PR。
 
-> 维护者注意：本仓库集成所用的 token 没有 `administration` 权限，无法用命令读写分支保护配置，
-> 上述规则需在 GitHub 网页端设置。
+> **当前实际配置（已核对）**：`protect-main` 已生效，规则为 `deletion` + `non_fast_forward` +
+> `pull_request`（`required_approving_review_count: 0`）+ `required_status_checks`（上表两条检查）；
+> Bypass 为 `Repository admin`（`bypass_mode: always`）；目标为默认分支（`~DEFAULT_BRANCH`）。
+>
+> 核对方式（**读** ruleset 用集成 token 即可，不需要 `administration`）：
+>
+> ```bash
+> gh api repos/:owner/:repo/rulesets --jq '.[] | {name, enforcement}'
+> gh api repos/:owner/:repo/rulesets/<id> --jq '{rules: [.rules[].type], bypass: .bypass_actors}'
+> ```
+>
+> 两点提醒：
+> - **写**（改规则）才需要 `administration` 权限；改配置走网页端最省事
+> - 别用旧式端点 `/repos/:owner/:repo/branches/main/protection`——本仓库用的是 **Rulesets**，该端点会返回 403
 
 ## 发布
 
